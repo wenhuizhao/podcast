@@ -1,21 +1,46 @@
+import axios from 'axios';
 import { FileUpload } from 'primereact/fileupload';
 import { Panel } from 'primereact/panel';
 import { useState } from 'react';
 
-import DraggableTextPanel from '@/components/DraggableTextPanel';
-
 export default function Home() {
   const [audioFile, setAudioFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   const onAudioUpload = (event) => {
+    console.log('onAudioUpload');
     setAudioFile(event.files[0]);
   };
 
   const onImageUpload = (event) => {
+    console.log('onImageUpload');
     setImageFile(event.files[0]);
+    console.log('setImageUpload', event.files[0]);
   };
 
+  const handleImageSubmit = async () => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    console.log('imagefile:', imageFile);
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log('File uploaded successfully:', response.data);
+      setImageUrl(response.data.url);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
   const handleSubmit = () => {
     if (audioFile && imageFile) {
       const formData = new FormData();
@@ -76,7 +101,7 @@ export default function Home() {
           style={{ width: '1280px', height: '760px' }}
           className="bg-white shadow-md rounded-lg p-6"
         >
-          <DraggableTextPanel onUpdate={onUpdate} />
+          {/* <DraggableTextPanel onUpdate={onUpdate} backgroundUrl={imageUrl} /> */}
         </Panel>
         <div className="flex flex-col items-center space-y-6">
           <FileUpload
@@ -93,12 +118,12 @@ export default function Home() {
             accept="image/*"
             maxFileSize={10000000}
             customUpload
-            uploadHandler={onImageUpload}
+            uploadHandler={(e) => onImageUpload(e)}
             chooseLabel="Upload Background Image"
             className="w-full max-w-md"
           />
           <button
-            onClick={handleSubmit}
+            onClick={handleImageSubmit}
             className="bg-blue-700 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-800"
           >
             Generate Video
