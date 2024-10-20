@@ -1,9 +1,9 @@
 import Axios from 'axios';
 
 const urls = {
-  test: `http://localhost:5000`,
-  development: 'http://localhost:5000/',
-  production: 'https://api.podcast.com/',
+  test: `http://localhost:5000/api/v1`,
+  development: 'http://localhost:5000/api/v1',
+  production: 'https://api.podcast.com/api/v1',
 };
 const api = Axios.create({
   baseURL: urls[process.env.NODE_ENV],

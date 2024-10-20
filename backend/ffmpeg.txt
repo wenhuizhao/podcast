@@ -1,0 +1,8 @@
+showwave:
+ ffmpeg -i  financial-podcast.mp3  -r 25 -filter_complex "[0:a]compand,showwaves=size=1280x720:colors=black:draw=full:mode=p2p,format=argb[vout]" -map "[vout]" -map 0:a -c:v qtrle -c:a copy output.mov
+get 1 frame as transparent background:
+ffmpeg -ss 00:00:50 -i output.mov -frames:v 1 -q:v 2 output.png
+
+ahistogram:
+ffmpeg -i  financial-podcast.mp3  -r 25 -filter_complex "[0:a]compand,avectorscope=size=1280x720:draw=full:mode=p2p,format=argb[vout]" -map "[vout]" -map 0:a -c:v qtrle -c:a copy output.mov
+
