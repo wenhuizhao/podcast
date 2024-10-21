@@ -27,7 +27,7 @@ def create_app():
     from app.routes.login_google import login_google_bp
     app.register_blueprint(users_bp, url_prefix='/api/v1')
     app.register_blueprint(videos_bp, url_prefix='/api/v1')
-    app.register_blueprint(login_gogole_bp, url_prefix='/api/v1')
+    app.register_blueprint(login_google_bp, url_prefix='/api/v1')
 
     from app.login import login_manager
     login_manager.init_app(app)

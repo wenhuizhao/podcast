@@ -1,7 +1,8 @@
 import os
 from werkzeug.utils import secure_filename
+from app.util.file_util import generate_unique_filename
 import boto3, botocore
-print(f'aws access key: ${os.getenv('AWS_ACCESS_KEY')}')
+print(f"aws access key: ${os.getenv('AWS_ACCESS_KEY')}")
 s3 = boto3.client(
     "s3",
     aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
@@ -10,7 +11,7 @@ s3 = boto3.client(
 def upload_file_to_s3(file, acl="public-read"):
     filename = secure_filename(file.filename)
     bucket = os.getenv("AWS_BUCKET_NAME")
-    key = filename
+    key = generate_unique_filename(filename)
     try:
         s3.upload_fileobj(
             file,

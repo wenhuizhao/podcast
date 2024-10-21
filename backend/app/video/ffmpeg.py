@@ -17,7 +17,7 @@ def run_ffmpeg_job(jobs, job_id, audio_path, title_text, title_font_family, titl
         filters = []
 
         # Waveform filter
-        waveform_filter = f"[1:a]showwaves=s=1280x760:mode=line:rate=25:colors={waveform_color}[waveform]"
+        waveform_filter = f"[1:a]showwaves=s=1280x720:mode=line:rate=25:colors={waveform_color}[waveform]"
         filters.append(waveform_filter)
 
         # Overlay waveform onto background image

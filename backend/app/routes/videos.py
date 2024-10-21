@@ -3,6 +3,7 @@ from app.database import db
 from app.models import User
 from itsdangerous import URLSafeTimedSerializer
 import os
+import sys
 from werkzeug.utils import secure_filename
 import threading
 import subprocess
@@ -35,14 +36,14 @@ def upload_file():
     
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        uniq_filename = f'{os.getenv('UPLOAD_FOLDER')}/{generate_unique_filename(filename)}'
+        uniq_filename = f"{os.getenv('UPLOAD_FOLDER')}/{generate_unique_filename(filename)}"
         #output = upload_file_to_s3(file)
         file.save(uniq_filename)
         if upload_type == 'image':
-            resized_filename = resize(uniq_filename, 1280, 760)
-            output = f"{url_for('videos.uploaded_file', filename=resized_filename)}"
+            resized_filename = resize(uniq_filename, 1280, 720)
+            output = resized_filename
         else:
-            output = f"{url_for('videos.uploaded_file', filename=uniq_filename)}"
+            output = uniq_filename
         # Assuming you want to return the URL of the uploaded image
         return jsonify({'url': output}), 200
     else:
