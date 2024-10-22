@@ -11,6 +11,7 @@ from app.util.s3_util import upload_file_to_s3
 from app.image.resize_image import resize
 from app.util.file_util import generate_unique_filename
 from app.video.ffmpeg import run_ffmpeg_job
+from app.services.db_service import create_job, get_job
 import uuid
 from flask_login import login_user
 
@@ -85,7 +86,8 @@ def create_video():
 
     # Generate a unique job ID
     job_id = str(uuid.uuid4())
-    jobs[job_id] = {'status': 'processing'}
+    create_job(job_id=job_id, status='processing')
+    #jobs[job_id] = {'status': 'processing'}
 
     # Start the ffmpeg job in a new thread
     print(f"audio:{audio_path}, title text:{title_text}, fontfamily:{title_font_family}")
@@ -97,7 +99,6 @@ def create_video():
     thread = threading.Thread(
         target=run_ffmpeg_job,
         args=(
-            jobs,
             job_id,
             audio_path,
             title_text,
@@ -123,13 +124,13 @@ def create_video():
 def get_job_status():
     """Endpoint to get the status of a job."""
     job_id = request.args.get('job_id')
-    if job_id not in jobs:
+    job = get_job(job_id)
+    if not job:
         return jsonify({'error': 'Invalid job ID'}), 400
 
-    job_info = jobs[job_id]
     return jsonify({
         'job_id': job_id,
-        'status': job_info['status'],
-        'output': job_info.get('output'),
-        'error': job_info.get('error')
+        'status': job.status,
+        'output': job.output,
+        'error': job.error
     }), 200

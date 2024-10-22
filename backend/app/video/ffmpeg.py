@@ -1,12 +1,13 @@
 import os
 import subprocess
 import traceback
+from app.services.db_service import update_job
 
 def escape_text(text):
     """Escape text for use in ffmpeg drawtext filter."""
     return text.replace('\\', '\\\\').replace("'", "\\'")
 
-def run_ffmpeg_job(jobs, job_id, audio_path, title_text, title_font_family, title_font_size, title_font_color,
+def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font_size, title_font_color,
                    title_location, description_text, description_font_family, description_font_size,
                    description_font_color, description_location, background_image_path, waveform_color):
     """Function to run the ffmpeg command asynchronously."""
@@ -61,11 +62,13 @@ def run_ffmpeg_job(jobs, job_id, audio_path, title_text, title_font_family, titl
         subprocess.run(command, check=True)
 
         # Update job status
-        jobs[job_id]['status'] = 'completed'
-        jobs[job_id]['output'] = output_video_path
+        update_job(job_id=job_id, status = 'completed', output=output_video_path)
+        # jobs[job_id]['status'] = 'completed'
+        # jobs[job_id]['output'] = output_video_path
 
     except Exception as e:
         # Update job status with error
-        jobs[job_id]['status'] = 'failed'
-        jobs[job_id]['error'] = str(e)
+        update_job(job_id=job_id, status='failed', error=str(e))
+        # jobs[job_id]['status'] = 'failed'
+        # jobs[job_id]['error'] = str(e)
         traceback.print_exc()
