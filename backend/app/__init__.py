@@ -12,7 +12,11 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # Replace with your secret key
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/notebookvideo'  # Replace with your DB credentials
+    db_host = os.getenv('DB_HOST', 'localhost')
+    db_username = os.getenv('DB_USERNAME', 'postgres')
+    db_password = os.getenv('DB_PASSWORD', 'postgres')
+    db_name = os.getenv('DB_NAME', 'notebookvideo')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{db_username}:{db_password}@{db_host}/{db_name}"  # Replace with your DB credentials
     db.init_app(app)
     migrate = Migrate(app, db)
 
