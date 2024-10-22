@@ -1,8 +1,9 @@
-
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
-
 from app import create_app
+import sys
+
+
+print('-------start------')
+print(sys.path)
 
 app = create_app()
 #bcrypt = Bcrypt(app)

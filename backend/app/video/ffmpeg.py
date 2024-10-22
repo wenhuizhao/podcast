@@ -10,6 +10,7 @@ def run_ffmpeg_job(jobs, job_id, audio_path, title_text, title_font_family, titl
                    title_location, description_text, description_font_family, description_font_size,
                    description_font_color, description_location, background_image_path, waveform_color):
     """Function to run the ffmpeg command asynchronously."""
+    ffmpeg = os.getenv('FFMPEG', 'ffmpeg')
     output_video_path = f"{os.getenv('DOWNLOAD_FOLDER')}/{job_id}.mp4"  # Adjust the output path accordingly
 
     try:
@@ -44,7 +45,7 @@ def run_ffmpeg_job(jobs, job_id, audio_path, title_text, title_font_family, titl
         print(f"filter_complex:{filter_complex}", flush=True)
         # Build the ffmpeg command
         command = [
-            'ffmpeg',
+            ffmpeg,
             '-y',
             '-loop', '1',
             '-i', background_image_path,
