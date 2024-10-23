@@ -3,6 +3,10 @@ import subprocess
 import traceback
 from app.services.db_service import update_job
 
+logo_text='NotebookVideo.com'
+logo_font='Arial'
+logo_color='white'
+logo_size=20
 def escape_text(text):
     """Escape text for use in ffmpeg drawtext filter."""
     return text.replace('\\', '\\\\').replace("'", "\\'")
@@ -40,7 +44,10 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
                                f"fontsize={font_size}:fontcolor={font_color}:x={x}:y={y}[text{i}]")
             filters.append(drawtext_filter)
             prev_label = f'[text{i}]'
-
+        logo_filter = (f"{prev_label}drawtext=text='{logo_text}':font='{logo_font}':"
+                      f"fontsize={logo_size}:fontcolor={logo_color}:x=w-tw-40:y=h-th-10[text{i+1}]")
+        filters.append(logo_filter)
+        prev_label = f'[text{i+1}]'
         filter_complex = ';'.join(filters)
         print(f"prev_label:{prev_label}", flush=True)
         print(f"filter_complex:{filter_complex}", flush=True)
