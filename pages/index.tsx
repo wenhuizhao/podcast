@@ -178,7 +178,7 @@ export default function Home() {
     {
       name: 'waveform line',
       color: 'red',
-      thumbnail: `/images/thumb_waveform2-blue.png`,
+      thumbnail: `/images/thumb_waveform2-red.png`,
       url: `${assetUrl}/waveform2-red.png`,
     },
     {
@@ -354,16 +354,10 @@ export default function Home() {
   //   setShowLoginPanel(true);
   // };
   return (
-    <div className="min-h-screen bg-blue-50 flex flex-col">
-      <header
-        className="shadow-md"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at left top, var(--primary-100), var(--primary-200))',
-        }}
-      >
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
+      <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">
         <nav className="container mx-auto py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-700">NotebookVideo</h1>
+          <h1 className="text-2xl font-bold text-center">NotebookVideo</h1>
           {/* <ul className="flex space-x-8">
             <li>
               <a href="#" className="text-blue-600 hover:text-blue-800">
@@ -389,14 +383,15 @@ export default function Home() {
       </header>
       <Toast ref={toast} />
       <main className="flex flex-grow flex-col container mx-auto p-2 flex flex-col items-center">
-        <h2 className="text-2xl font-semibold text-center text-blue-700 mt-4 mb-2">
-          Transform Your Podcasts into Engaging Videos in Minutes
-        </h2>
-        <h4 className="text-2x font-semibold text-center text-blue-500 mb-4">
-          Upload your audio, customize with waveforms and background images, and
-          watch your podcasts come to life as captivating videos—ready to share
-          anywhere!
-        </h4>
+        <div className="text-center mt-12 mb-4">
+          <h2 className="text-4xl font-extrabold text-gray-800 mb-2">
+            Transform Your Podcasts into Engaging Videos
+          </h2>
+          <p className="text-lg text-gray-600">
+            Upload your audio, customize with waveforms and background images,
+            and watch your podcasts come to life as captivating videos.
+          </p>
+        </div>
         <div className="card flex justify-content-center">
           <ProgressSpinner hidden={!showProgress} />
         </div>
@@ -414,10 +409,14 @@ export default function Home() {
                 </div>
                 <Carousel
                   value={waveformImages}
-                  numVisible={5}
-                  numScroll={5}
+                  numVisible={4}
+                  numScroll={4}
                   orientation="vertical"
-                  footer={<div className="text-center">waveform</div>}
+                  footer={
+                    <div className="text-center text-lg text-gray-600">
+                      waveform
+                    </div>
+                  }
                   verticalViewPortHeight="320px"
                   itemTemplate={WaveformTemplate}
                 />
@@ -431,7 +430,9 @@ export default function Home() {
                   numVisible={5}
                   numScroll={5}
                   header={
-                    <div className="text-center">Choose background image</div>
+                    <div className="text-center text-lg text-gray-600">
+                      Choose background image
+                    </div>
                   }
                   itemTemplate={BackgroundImageTemplate}
                 />
@@ -443,12 +444,12 @@ export default function Home() {
                 customUpload
                 uploadHandler={onImageUpload}
                 chooseLabel="Upload Background Image"
-                className="w-full max-w-md"
+                className="w-full max-w-md custom-file-upload"
               />
             </div>
             <div className="flex flex-col ">
               <Panel>
-                <p>change title style</p>
+                <p className="text-lg text-gray-600">Change title style</p>
                 <div className="flex items-center">
                   <Dropdown
                     value={titleState.fontFamily}
@@ -478,7 +479,9 @@ export default function Home() {
                 </div>
               </Panel>
               <Panel>
-                <p>Change description style</p>
+                <p className="text-lg text-gray-600">
+                  Change description style
+                </p>
                 <div className="flex items-center">
                   <Dropdown
                     value={descriptionState.fontFamily}
@@ -517,11 +520,11 @@ export default function Home() {
                   customUpload
                   uploadHandler={onAudioUpload}
                   chooseLabel="Upload Audio File"
-                  className=" mb-3 max-w-md"
+                  className="ml-4 mb-3 max-w-md custom-file-upload"
                 />
                 <button
                   onClick={handleGenerateVideo}
-                  className="bg-blue-700 text-white px-3 py-3 mx-3 rounded-lg shadow hover:bg-blue-800"
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition"
                 >
                   Generate Video
                 </button>
@@ -550,10 +553,8 @@ export default function Home() {
           content={({}) => <LoginPanel />}
         ></Dialog>
       </main>
-      <footer className="bg-white mt-auto shadow-md py-4">
-        <div className="container mx-auto text-center text-blue-600">
-          &copy; 2024 NotebookVideo. All Rights Reserved.
-        </div>
+      <footer className="bg-blue-600 text-white text-center py-4 mt-auto w-full">
+        &copy; 2024 NotebookVideo. All Rights Reserved.
       </footer>
     </div>
   );

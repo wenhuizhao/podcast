@@ -11,7 +11,7 @@ export const BackgroundImageTemplate = (backgroundImage: BackgroundImage) => {
       <img
         src={backgroundImage.thumbnail}
         alt={backgroundImage.name}
-        className="w-6 shadow-2"
+        className="w-10 shadow rounded-lg"
         onClick={backgroundImage.onClick}
       />
     </div>

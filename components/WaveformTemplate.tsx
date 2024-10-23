@@ -11,7 +11,7 @@ export const WaveformTemplate = (waveformImage: WaveformImage) => {
       <img
         src={waveformImage.thumbnail}
         alt={waveformImage.name}
-        className="h-8 shadow-2"
+        className="h-12 shadow rounded-lg"
         onClick={waveformImage.onClick}
       />
     </div>
