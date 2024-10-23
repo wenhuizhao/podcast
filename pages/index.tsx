@@ -65,6 +65,13 @@ export default function Home() {
   let descriptionPosition: Position;
 
   const bgImages = [
+    { name: 'bg1', url: `${assetUrl}/bg6.png` },
+    { name: 'bg2', url: `${assetUrl}/bg7.png` },
+    { name: 'bg3', url: `${assetUrl}/bg8.png` },
+    { name: 'bg3', url: `${assetUrl}/bg9.png` },
+    { name: 'bg3', url: `${assetUrl}/bg10.png` },
+    { name: 'bg3', url: `${assetUrl}/bg11.png` },
+    { name: 'bg3', url: `${assetUrl}/bg12.png` },
     { name: 'bg1', url: `${assetUrl}/bg1.png` },
     { name: 'bg2', url: `${assetUrl}/bg2.png` },
     { name: 'bg3', url: `${assetUrl}/bg3.png` },
@@ -349,8 +356,8 @@ export default function Home() {
                 </div>
                 <Carousel
                   value={waveformImages}
-                  numVisible={3}
-                  numScroll={3}
+                  numVisible={5}
+                  numScroll={5}
                   orientation="vertical"
                   footer={<div className="text-center">waveform</div>}
                   verticalViewPortHeight="320px"
@@ -363,8 +370,8 @@ export default function Home() {
               >
                 <Carousel
                   value={backgroundImages}
-                  numVisible={3}
-                  numScroll={3}
+                  numVisible={5}
+                  numScroll={5}
                   header={
                     <div className="text-center">Choose background image</div>
                   }
