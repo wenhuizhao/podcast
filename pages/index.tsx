@@ -25,7 +25,7 @@ import DraggableTextPanel, {
 import LoginPanel from '@/components/LoginPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
-import api, { homeUrl } from '@/services/api';
+import api, { assetUrl } from '@/services/api';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 const fontFamilies = [
@@ -65,62 +65,62 @@ export default function Home() {
   let descriptionPosition: Position;
 
   const bgImages = [
-    { name: 'bg1', url: `${homeUrl}/images/bg1.png` },
-    { name: 'bg2', url: `${homeUrl}/images/bg2.png` },
-    { name: 'bg3', url: `${homeUrl}/images/bg3.png` },
-    { name: 'bg3', url: `${homeUrl}/images/bg4.png` },
-    { name: 'bg3', url: `${homeUrl}/images/bg5.png` },
+    { name: 'bg1', url: `${assetUrl}/bg1.png` },
+    { name: 'bg2', url: `${assetUrl}/bg2.png` },
+    { name: 'bg3', url: `${assetUrl}/bg3.png` },
+    { name: 'bg3', url: `${assetUrl}/bg4.png` },
+    { name: 'bg3', url: `${assetUrl}/bg5.png` },
   ];
   const wfImages = [
     {
       name: 'waveform',
       color: 'white',
-      url: `${homeUrl}/images/waveform1-white.png`,
+      url: `${assetUrl}/waveform1-white.png`,
     },
     {
       name: 'waveform',
       color: 'black',
-      url: `${homeUrl}/images/waveform1-black.png`,
+      url: `${assetUrl}/waveform1-black.png`,
     },
     {
       name: 'waveform',
       color: 'blue',
-      url: `${homeUrl}/images/waveform1-blue.png`,
+      url: `${assetUrl}/waveform1-blue.png`,
     },
     {
       name: 'waveform',
       color: 'red',
-      url: `${homeUrl}/images/waveform1-red.png`,
+      url: `${assetUrl}/waveform1-red.png`,
     },
     {
       name: 'waveform',
       color: 'orange',
-      url: `${homeUrl}/images/waveform1-orange.png`,
+      url: `${assetUrl}/waveform1-orange.png`,
     },
     {
       name: 'waveform line',
       color: 'white',
-      url: `${homeUrl}/images/waveform2-white.png`,
+      url: `${assetUrl}/waveform2-white.png`,
     },
     {
       name: 'waveform line',
       color: 'black',
-      url: `${homeUrl}/images/waveform2-black.png`,
+      url: `${assetUrl}/waveform2-black.png`,
     },
     {
       name: 'waveform line',
       color: 'blue',
-      url: `${homeUrl}/images/waveform2-blue.png`,
+      url: `${assetUrl}/waveform2-blue.png`,
     },
     {
       name: 'waveform line',
       color: 'red',
-      url: `${homeUrl}/images/waveform2-red.png`,
+      url: `${assetUrl}/waveform2-red.png`,
     },
     {
       name: 'waveform line',
       color: 'orange',
-      url: `${homeUrl}/images/waveform2-orange.png`,
+      url: `${assetUrl}/waveform2-orange.png`,
     },
   ];
 

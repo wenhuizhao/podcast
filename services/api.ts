@@ -20,5 +20,11 @@ const homeUrls = {
   development: 'http://localhost:3000',
   production: 'https://www.notebookvideo.com',
 };
+const assetUrls = {
+  test: `http://localhost:3000/images`,
+  development: 'http://localhost:3000/images',
+  production: 'https://notebookvideo.s3.us-west-2.amazonaws.com',
+};
 export const homeUrl = homeUrls[process.env.NODE_ENV];
+export const assetUrl = assetUrls[process.env.NODE_ENV];
 export default api;
