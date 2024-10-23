@@ -37,13 +37,13 @@ const DraggableTextPanel: React.FC<Props> = ({
   // State for the title text box
   const [titleState, setTitleState] = useState<UpdateData>({
     text: undefined,
-    position: { x: 100, y: 10 },
+    position: { x: 270, y: 10 },
   });
 
   // State for the description text box
   const [descriptionState, setDescriptionState] = useState<UpdateData>({
     text: undefined,
-    position: { x: 100, y: 100 },
+    position: { x: 265, y: 100 },
   });
 
   // Update the parent component whenever state changes
@@ -74,6 +74,7 @@ const DraggableTextPanel: React.FC<Props> = ({
 
   // Handler for dragging the title text box
   const handleTitleDrag: DraggableEventHandler = (e, data) => {
+    //console.log('handleTitledrap:', data);
     setTitleState((prevState) => ({
       ...prevState,
       position: { x: data.x, y: data.y },
@@ -82,6 +83,7 @@ const DraggableTextPanel: React.FC<Props> = ({
 
   // Handler for dragging the description text box
   const handleDescriptionDrag: DraggableEventHandler = (e, data) => {
+    //console.log('handleDescdrag', data);
     setDescriptionState((prevState) => ({
       ...prevState,
       position: { x: data.x, y: data.y },
@@ -92,7 +94,7 @@ const DraggableTextPanel: React.FC<Props> = ({
     <div
       style={{
         width: '640px',
-        height: '380px',
+        height: '360px',
         position: 'relative',
         border: '1px solid #ccc',
         overflow: 'hidden',

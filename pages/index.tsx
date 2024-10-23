@@ -26,6 +26,7 @@ import LoginPanel from '@/components/LoginPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
 import api, { homeUrl } from '@/services/api';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const fontFamilies = [
   'Arial',
@@ -44,6 +45,7 @@ export default function Home() {
   const [showVideoPanel, setShowVideoPanel] = useState<boolean>(false);
   const [showLoginPanel, setShowLoginPanel] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>();
+  const [showProgress, setShowProgress] = useState<boolean>(false);
   const toast = useRef<Toast>(null);
 
   const [titleState, setTitleState] = useState<FontType>({
@@ -153,6 +155,7 @@ export default function Home() {
     console.log('uploadfile:', filename);
 
     try {
+      setShowProgress(true);
       const response = await api.post('/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -168,6 +171,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error uploading file:', error);
+    } finally {
+      setShowProgress(false);
     }
   };
   const showToast = (
@@ -211,7 +216,7 @@ export default function Home() {
             text: titleText,
             position: {
               x: titlePosition.x * 2,
-              y: titlePosition.y * 2,
+              y: (titlePosition.y + 15) * 2,
             },
           },
           description: {
@@ -219,7 +224,7 @@ export default function Home() {
             text: descriptionText,
             position: {
               x: descriptionPosition.x * 2,
-              y: descriptionPosition.y * 2,
+              y: (descriptionPosition.y + 67) * 2,
             },
           },
         },
@@ -238,7 +243,7 @@ export default function Home() {
   };
 
   const onUpdate: (update: UpdateType) => void = ({ title, description }) => {
-    console.log('update', title, description);
+    //console.log('update', title, description);
     titleText = title.text;
     titlePosition = title.position;
     descriptionText = description.text;
@@ -327,6 +332,9 @@ export default function Home() {
           watch your podcasts come to life as captivating videos—ready to share
           anywhere!
         </h4>
+        <div className="card flex justify-content-center">
+          <ProgressSpinner hidden={!showProgress} />
+        </div>
         <Panel className="bg-white shadow-md rounded-lg p-6 container flex">
           <div className="container flex">
             <div className="container flex flex-col items-center">
