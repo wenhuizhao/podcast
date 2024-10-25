@@ -2,6 +2,9 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  images: {
+    domains: ['localhost','www.notebookvideo.com'],
+  },
   async rewrites() {
     return [
       {
