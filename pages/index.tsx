@@ -26,6 +26,7 @@ import SignInPanel from '@/components/SignInPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
 import api, { assetUrl } from '@/services/api';
+import Link from 'next/link';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 const fontFamilies = [
@@ -364,23 +365,29 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-center">NotebookVideo</h1>
           <ul className="flex space-x-8">
             <li>
-              <a href="/" className="text-white font-bold hover:text-blue-800">
+              <Link
+                href="/"
+                className="text-white font-bold hover:text-blue-800"
+              >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/" className="text-white font-bold hover:text-blue-800">
+              <Link
+                href="/"
+                className="text-white font-bold hover:text-blue-800"
+              >
                 Gallery
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="text-white font-bold hover:text-blue-800"
                 onClick={handleShowLogin}
               >
                 Login
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
@@ -557,10 +564,6 @@ export default function Home() {
           content={({}) => <SignInPanel onCancel={onCancelLogin} />}
         ></Dialog>
       </main>
-      <footer className="bg-blue-600 text-white text-center py-4 mt-auto w-full">
-        &copy; 2024 NotebookVideo. All Rights Reserved. |{' '}
-        <a href="/term">Term</a> | <a href="/privacy">Privacy</a>
-      </footer>
     </div>
   );
 }

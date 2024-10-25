@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Message } from 'primereact/message';
 import { useState } from 'react';
 
-import api from '@/services/api';
+import api, { apiRoot } from '@/services/api';
 
 export interface Props {
   onCancel: () => void;
@@ -42,12 +42,9 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/login/google';
+    window.location.href = `${apiRoot}/login/google`;
   };
 
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('cancel', e.target);
-  };
   const handleSignUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
@@ -92,6 +89,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
           <div className="flex justify-center m-4">
             <a
               href="#"
+              onClick={handleGoogleLogin}
               className="text-white text-lg font-semibold hover:underline"
             >
               Login by google
@@ -108,10 +106,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
               )}
             </div>
             <div>
-              <label
-                for="email"
-                className="block text-white text-sm font-medium"
-              >
+              <label className="block text-white text-sm font-medium">
                 Email
               </label>
               <input
@@ -126,10 +121,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
               />
             </div>
             <div>
-              <label
-                for="password"
-                className="block text-white text-sm font-medium"
-              >
+              <label className="block text-white text-sm font-medium">
                 Password
               </label>
               <input
@@ -197,10 +189,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
               )}
             </div>
             <div>
-              <label
-                for="email"
-                className="block text-white text-sm font-medium"
-              >
+              <label className="block text-white text-sm font-medium">
                 Email
               </label>
               <input
@@ -215,10 +204,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
               />
             </div>
             <div>
-              <label
-                for="password"
-                className="block text-white text-sm font-medium"
-              >
+              <label className="block text-white text-sm font-medium">
                 Password
               </label>
               <input

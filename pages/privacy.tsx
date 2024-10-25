@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const Privacy = () => (
   <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
     <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">
@@ -5,19 +7,19 @@ const Privacy = () => (
         <h1 className="text-2xl font-bold text-center">NotebookVideo</h1>
         <ul className="flex space-x-8">
           <li>
-            <a href="/" className="text-white font-bold hover:text-blue-800">
+            <Link href="/" className="text-white font-bold hover:text-blue-800">
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/" className="text-white font-bold hover:text-blue-800">
+            <Link href="/" className="text-white font-bold hover:text-blue-800">
               Gallery
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/" className="text-white font-bold hover:text-blue-800">
+            <Link href="/" className="text-white font-bold hover:text-blue-800">
               Login
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>
@@ -53,9 +55,9 @@ const Privacy = () => (
       <p>
         The website does use third party services that may collect information
         used to identify you. Here is the link to
-        <a href="https://policies.google.com/privacy">
+        <Link href="https://policies.google.com/privacy">
           Google Sign-in and Google Drive Services privacy policy
-        </a>
+        </Link>
       </p>
       <p>
         <strong>Log Data</strong>
@@ -145,8 +147,8 @@ const Privacy = () => (
       </p>
     </main>
     <footer className="bg-blue-600 text-white text-center py-4 mt-auto w-full">
-      &copy; 2024 NotebookVideo. All Rights Reserved. | <a href="/term">Term</a>{' '}
-      | <a href="/privacy">Privacy</a>
+      &copy; 2024 NotebookVideo. All Rights Reserved. |{' '}
+      <Link href="/term">Term</Link> | <Link href="/privacy">Privacy</Link>
     </footer>
   </div>
 );
