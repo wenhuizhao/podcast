@@ -87,13 +87,20 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
           </a> */}
           </div>
           <div className="flex justify-center m-4">
-            <a
+            {/* <a
               href="#"
               onClick={handleGoogleLogin}
               className="text-white text-lg font-semibold hover:underline"
             >
               Login by google
-            </a>
+            </a> */}
+            <button
+              type="button"
+              className="google-sign-in-button"
+              onClick={handleGoogleLogin}
+            >
+              Sign in with Google
+            </button>
           </div>
           <form className="space-y-6">
             <div className="flex justify-center">
