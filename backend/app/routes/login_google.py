@@ -58,4 +58,4 @@ def google_callback():
         db.session.commit()
 
     login_user(user)
-    return redirect('/')  # Redirect to the home page or dashboard
+    return redirect(os.getenv('FRONTEND_HOME', '/'))  # Redirect to the home page or dashboard

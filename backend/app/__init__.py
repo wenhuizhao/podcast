@@ -10,11 +10,13 @@ import sys
 def create_app():
     load_dotenv()
     app = Flask(__name__)
-    CORS(app)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # Replace with your secret key
-    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
-    app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to the session cookie
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Adjust as needed ('Strict', 'Lax', 'None')
+    # app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+    # app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to the session cookie
+    # app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Adjust as needed ('Strict', 'Lax', 'None')
+    CORS(app, supports_credentials=True)
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
     db_host = os.getenv('DB_HOST', 'localhost')
     db_username = os.getenv('DB_USERNAME', 'postgres')
     db_password = os.getenv('DB_PASSWORD', 'postgres')
