@@ -111,6 +111,8 @@ const DraggableTextPanel: React.FC<Props> = ({
           <textarea
             placeholder="Your title here"
             value={titleState.text}
+            rows={2}
+            cols={50}
             onChange={(e) => handleTitleChange(e.target.value)}
             style={{
               fontFamily: title.fontFamily,
@@ -134,6 +136,8 @@ const DraggableTextPanel: React.FC<Props> = ({
           <textarea
             placeholder="Your description here"
             value={descriptionState.text}
+            rows={4}
+            cols={50}
             onChange={(e) => handleDescriptionChange(e.target.value)}
             style={{
               fontFamily: description.fontFamily,

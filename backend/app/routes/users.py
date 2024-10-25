@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, url_for, redirect, send_from_dire
 from app.database import db
 from app.models import User
 from app.encrypt import bcrypt
+from app.util.email_util import send_email
 from itsdangerous import URLSafeTimedSerializer
 import os
 from flask_login import login_user
@@ -23,7 +24,7 @@ def register():
     db.session.commit()
 
     token = s.dumps(user.email, salt='email-confirm')
-    verification_url = url_for('verify_email', token=token, _external=True)
+    verification_url = url_for('users.verify_email', token=token, _external=True)
 
     # Email content
     subject = "Email Verification"
@@ -67,7 +68,7 @@ def login():
             login_user(user)
             return jsonify({'message': 'Logged in successfully.'}), 200
         else:
-            return jsonify({'message': 'Please verify your email first.'}), 401
+            return jsonify({'message': 'Please verify your email first.'}), 422
     else:
         return jsonify({'message': 'Invalid credentials.'}), 401
 
@@ -77,7 +78,7 @@ def reset_password_request():
     user = User.query.filter_by(email=data['email']).first()
     if user:
         token = s.dumps(user.email, salt='password-reset')
-        reset_url = url_for('reset_password', token=token, _external=True)
+        reset_url = url_for('users.reset_password', token=token, _external=True)
 
         # Email content
         subject = "Password Reset Request"

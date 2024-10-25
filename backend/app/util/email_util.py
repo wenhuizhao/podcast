@@ -5,10 +5,10 @@ from botocore.exceptions import ClientError
 def send_email(to_email, subject, body_text, body_html=None):
     # Replace sender@example.com with your "From" address.
     # This address must be verified with Amazon SES.
-    SENDER = "Your Name <sender@example.com>"  # Replace with your verified sender email
+    SENDER = "Admin<admin@notebookvideo.com>"  # Replace with your verified sender email
 
     # If necessary, replace us-east-1 with the AWS Region you're using for SES.
-    AWS_REGION = "us-east-1"
+    AWS_REGION = "us-west-2"
 
     # Create a new SES resource and specify the AWS Region.
     client = boto3.client('ses', region_name=AWS_REGION)

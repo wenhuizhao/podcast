@@ -22,7 +22,7 @@ import DraggableTextPanel, {
   Position,
   UpdateType,
 } from '@/components/DraggableTextPanel';
-import LoginPanel from '@/components/LoginPanel';
+import SignInPanel from '@/components/SignInPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
 import api, { assetUrl } from '@/services/api';
@@ -319,6 +319,10 @@ export default function Home() {
     setShowVideoPanel(false);
   };
 
+  const onCancelLogin = () => {
+    setShowLoginPanel(false);
+  };
+
   const handleTitleChange = (
     field: string,
     value:
@@ -350,35 +354,35 @@ export default function Home() {
       [field]: value,
     }));
   };
-  // const handleShowLogin = () => {
-  //   setShowLoginPanel(true);
-  // };
+  const handleShowLogin = () => {
+    setShowLoginPanel(true);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
       <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">
         <nav className="container mx-auto py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-center">NotebookVideo</h1>
-          {/* <ul className="flex space-x-8">
+          <ul className="flex space-x-8">
             <li>
-              <a href="#" className="text-blue-600 hover:text-blue-800">
+              <a href="/" className="text-white font-bold hover:text-blue-800">
                 Home
               </a>
             </li>
             <li>
-              <a href="#" className="text-blue-600 hover:text-blue-800">
+              <a href="/" className="text-white font-bold hover:text-blue-800">
                 Gallery
               </a>
             </li>
             <li>
               <a
                 href="#"
-                className="text-blue-600 hover:text-blue-800"
+                className="text-white font-bold hover:text-blue-800"
                 onClick={handleShowLogin}
               >
                 Login
               </a>
             </li>
-          </ul> */}
+          </ul>
         </nav>
       </header>
       <Toast ref={toast} />
@@ -550,11 +554,12 @@ export default function Home() {
             if (!showLoginPanel) return;
             setShowLoginPanel(false);
           }}
-          content={({}) => <LoginPanel />}
+          content={({}) => <SignInPanel onCancel={onCancelLogin} />}
         ></Dialog>
       </main>
       <footer className="bg-blue-600 text-white text-center py-4 mt-auto w-full">
-        &copy; 2024 NotebookVideo. All Rights Reserved.
+        &copy; 2024 NotebookVideo. All Rights Reserved. |{' '}
+        <a href="/term">Term</a> | <a href="/privacy">Privacy</a>
       </footer>
     </div>
   );

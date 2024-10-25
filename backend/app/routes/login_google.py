@@ -1,7 +1,10 @@
 import os
-from flask import Blueprint
+from flask import Blueprint, url_for, redirect, request
 from oauthlib.oauth2 import WebApplicationClient
 import requests
+from app.models import User
+from flask_login import login_user
+from app.database import db
 
 login_google_bp = Blueprint('login_google', __name__)
 
@@ -14,7 +17,7 @@ def google_login():
 
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri=url_for('google_callback', _external=True),
+        redirect_uri=url_for('login_google.google_callback', _external=True),
         scope=['openid', 'email', 'profile'],
     )
     return redirect(request_uri)
@@ -29,7 +32,7 @@ def google_callback():
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
-        redirect_url=url_for('google_callback', _external=True),
+        redirect_url=url_for('login_google.google_callback', _external=True),
         code=code
     )
     token_response = requests.post(
