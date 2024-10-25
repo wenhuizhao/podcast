@@ -24,6 +24,9 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
     try {
       const response = await api.post('/login', { email, password });
       console.log(response.data.message);
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      axios.defaults.headers['Authorization'] = token ? `Bearer ${token}` : '';
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.status);

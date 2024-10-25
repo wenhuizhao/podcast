@@ -22,11 +22,12 @@ import DraggableTextPanel, {
   Position,
   UpdateType,
 } from '@/components/DraggableTextPanel';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import SignInPanel from '@/components/SignInPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
 import api, { assetUrl } from '@/services/api';
-import Link from 'next/link';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 const fontFamilies = [
@@ -360,38 +361,7 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
-      <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">
-        <nav className="container mx-auto py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-center">NotebookVideo</h1>
-          <ul className="flex space-x-8">
-            <li>
-              <Link
-                href="/"
-                className="text-white font-bold hover:text-blue-800"
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/"
-                className="text-white font-bold hover:text-blue-800"
-              >
-                Gallery
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="text-white font-bold hover:text-blue-800"
-                onClick={handleShowLogin}
-              >
-                Login
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </header>
+      <Header showLogin={handleShowLogin} />
       <Toast ref={toast} />
       <main className="flex flex-grow flex-col container mx-auto p-2 flex flex-col items-center">
         <div className="text-center mt-12 mb-4">
@@ -564,6 +534,7 @@ export default function Home() {
           content={({}) => <SignInPanel onCancel={onCancelLogin} />}
         ></Dialog>
       </main>
+      <Footer />
     </div>
   );
 }

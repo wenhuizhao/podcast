@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import Footer from '@/components/Footer';
+
 const Privacy = () => (
   <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
     <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">
@@ -146,10 +148,7 @@ const Privacy = () => (
         not hesitate to contact us.
       </p>
     </main>
-    <footer className="bg-blue-600 text-white text-center py-4 mt-auto w-full">
-      &copy; 2024 NotebookVideo. All Rights Reserved. |{' '}
-      <Link href="/term">Term</Link> | <Link href="/privacy">Privacy</Link>
-    </footer>
+    <Footer />
   </div>
 );
 

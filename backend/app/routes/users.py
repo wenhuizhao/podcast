@@ -5,11 +5,16 @@ from app.encrypt import bcrypt
 from app.util.email_util import send_email
 from itsdangerous import URLSafeTimedSerializer
 import os
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user
+from app.login import login_manager
+import jwt
+from datetime import datetime, timedelta
 
 users_bp = Blueprint('users', __name__)
 
 s = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 @users_bp.route('/register', methods=['POST'])
 def register():
@@ -66,11 +71,21 @@ def login():
     if user and bcrypt.check_password_hash(user.password, data['password']):
         if user.is_verified:
             login_user(user)
-            return jsonify({'message': 'Logged in successfully.'}), 200
+            token = jwt.encode({
+                'user_id': user.id,
+                'email': user.email,
+                'exp': datetime.utcnow() + timedelta(hours=5)  # Token expires in 1 hour
+            }, SECRET_KEY, algorithm='HS256')
+            return jsonify({'token': token}), 200
         else:
             return jsonify({'message': 'Please verify your email first.'}), 422
     else:
         return jsonify({'message': 'Invalid credentials.'}), 401
+
+@users_bp.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+    return jsonify({'message': 'Logged out successfully.'}), 200
 
 @users_bp.route('/reset-password', methods=['POST'])
 def reset_password_request():
@@ -111,3 +126,13 @@ def reset_password(token):
     db.session.commit()
     return jsonify({'message': 'Your password has been updated.'}), 200
 
+@users_bp.route('/login-status', methods=['GET'])
+def login_status():
+    if current_user.is_authenticated:
+        return jsonify({'logged_in': True, 'email': current_user.email})
+    else:
+        return jsonify({'logged_in': False})
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return jsonify({'message': 'You must be logged in to access this resource.'}), 401

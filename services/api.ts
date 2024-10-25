@@ -1,3 +1,5 @@
+'use client';
+
 import Axios from 'axios';
 
 const urls = {
@@ -5,7 +7,9 @@ const urls = {
   development: 'http://localhost:5000/api/v1',
   production: 'https://api.notebookvideo.com/api/v1',
 };
+
 const api = Axios.create({
+  withCredentials: true,
   baseURL: urls[process.env.NODE_ENV],
   headers: {
     Accept: 'application/json',

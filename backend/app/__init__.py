@@ -12,6 +12,9 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # Replace with your secret key
+    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+    app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to the session cookie
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Adjust as needed ('Strict', 'Lax', 'None')
     db_host = os.getenv('DB_HOST', 'localhost')
     db_username = os.getenv('DB_USERNAME', 'postgres')
     db_password = os.getenv('DB_PASSWORD', 'postgres')
@@ -25,6 +28,7 @@ def create_app():
     app.config['DOWNLOAD_FOLDER'] = os.getenv('DOWNLOAD_FOLDER')
     os.makedirs(os.getenv('UPLOAD_FOLDER'), exist_ok=True)
     os.makedirs(os.getenv('DOWNLOAD_FOLDER'), exist_ok=True)
+
 
     from app.routes.users import users_bp
     from app.routes.videos import videos_bp
