@@ -1,30 +1,38 @@
 import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export interface Props {
   showLogin: () => void;
+  loginState: LoginState;
 }
-interface LoginState {
+export interface LoginState {
   logged_in: boolean;
   email: string;
 }
-interface CustomClaim {
+export interface CustomClaim {
   user_id: string;
   email: string;
   exp: number;
 }
-const Header: React.FC<Props> = ({ showLogin }) => {
+const Header: React.FC<Props> = ({ showLogin, loginState }) => {
   const [loginStatus, setLoginStatus] = useState<LoginState>({
-    logged_in: false,
-    email: '',
+    ...loginState,
   });
-
+  const router = useRouter();
+  console.log('loginState:', loginState, loginStatus);
   useEffect(() => {
+    console.log('setLoginStatus:', loginState);
+    setLoginStatus(loginState);
+    if (loginState.logged_in) {
+      return;
+    }
     const token = localStorage.getItem('token');
     if (token) {
       try {
         // Decode token to get user info
+        console.log('token', token);
         const decoded = jwtDecode<CustomClaim>(token);
         // Check token expiration
         if (decoded.exp * 1000 > Date.now()) {
@@ -38,10 +46,12 @@ const Header: React.FC<Props> = ({ showLogin }) => {
         localStorage.removeItem('token');
       }
     }
-  }, []);
-  const logOut = () => {
+  }, [loginState]);
+  const logOut = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     setLoginStatus({ logged_in: false, email: '' });
     localStorage.removeItem('token');
+    router.push('/');
   };
   return (
     <header className="shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2">

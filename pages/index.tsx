@@ -16,6 +16,7 @@ import { Toast } from 'primereact/toast';
 import { useRef, useState } from 'react';
 
 import { BackgroundImageTemplate } from '@/components/BackgroundImageTemplate';
+import { bgImages, wfImages } from '@/components/Images';
 
 import DraggableTextPanel, {
   FontType,
@@ -23,13 +24,15 @@ import DraggableTextPanel, {
   UpdateType,
 } from '@/components/DraggableTextPanel';
 import Footer from '@/components/Footer';
-import Header from '@/components/Header';
+import Header, { CustomClaim, LoginState } from '@/components/Header';
 import SignInPanel from '@/components/SignInPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
-import api, { assetUrl } from '@/services/api';
+import api from '@/services/api';
+import { jwtDecode } from 'jwt-decode';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { ProgressSpinner } from 'primereact/progressspinner';
-
 const fontFamilies = [
   'Arial',
   'Courier New',
@@ -38,7 +41,7 @@ const fontFamilies = [
   'Verdana',
 ];
 
-export default function Home() {
+const Home = () => {
   const [audioFile, setAudioFile] = useState<FileUploadFile>();
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>('');
   const [waveformImageUrl, setWaveformImageUrl] = useState<string>('');
@@ -48,7 +51,30 @@ export default function Home() {
   const [showLoginPanel, setShowLoginPanel] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>();
   const [showProgress, setShowProgress] = useState<boolean>(false);
+  // const [loginState, setLoginState] = useState<LoginState>({
+  //   logged_in: false,
+  //   email: '',
+  // });
+
+  const router = useRouter();
   const toast = useRef<Toast>(null);
+
+  const searchParam = useSearchParams();
+  console.log('home searchParam', searchParam.get('token'));
+  const token = searchParam.get('token');
+  let loginState: LoginState = { logged_in: false, email: '' };
+  if (token) {
+    const decoded = jwtDecode<CustomClaim>(token);
+    // Check token expiration
+    if (decoded.exp * 1000 > Date.now()) {
+      loginState = { logged_in: true, email: decoded.email };
+      localStorage.setItem('token', token || '');
+    } else {
+      // Token has expired
+      localStorage.removeItem('token');
+    }
+    router.push('/');
+  }
 
   const [titleState, setTitleState] = useState<FontType>({
     fontFamily: 'Arial',
@@ -65,131 +91,6 @@ export default function Home() {
   let titlePosition: Position;
   let descriptionText: string | undefined;
   let descriptionPosition: Position;
-
-  const bgImages = [
-    {
-      name: 'bg6',
-      thumbnail: '/images/thumb_bg6.png',
-      url: `${assetUrl}/bg6.png`,
-    },
-    {
-      name: 'bg7',
-      thumbnail: '/images/thumb_bg7.png',
-      url: `${assetUrl}/bg7.png`,
-    },
-    {
-      name: 'bg8',
-      thumbnail: '/images/thumb_bg8.png',
-      url: `${assetUrl}/bg8.png`,
-    },
-    {
-      name: 'bg9',
-      thumbnail: '/images/thumb_bg9.png',
-      url: `${assetUrl}/bg9.png`,
-    },
-    {
-      name: 'bg10',
-      thumbnail: '/images/thumb_bg10.png',
-      url: `${assetUrl}/bg10.png`,
-    },
-    {
-      name: 'bg11',
-      thumbnail: '/images/thumb_bg11.png',
-      url: `${assetUrl}/bg11.png`,
-    },
-    {
-      name: 'bg12',
-      thumbnail: '/images/thumb_bg12.png',
-      url: `${assetUrl}/bg12.png`,
-    },
-    {
-      name: 'bg1',
-      thumbnail: '/images/thumb_bg1.png',
-      url: `${assetUrl}/bg1.png`,
-    },
-    {
-      name: 'bg2',
-      thumbnail: '/images/thumb_bg2.png',
-      url: `${assetUrl}/bg2.png`,
-    },
-    {
-      name: 'bg3',
-      thumbnail: '/images/thumb_bg3.png',
-      url: `${assetUrl}/bg3.png`,
-    },
-    {
-      name: 'bg3',
-      thumbnail: '/images/thumb_bg4.png',
-      url: `${assetUrl}/bg4.png`,
-    },
-    {
-      name: 'bg3',
-      thumbnail: '/images/thumb_bg5.png',
-      url: `${assetUrl}/bg5.png`,
-    },
-  ];
-  const wfImages = [
-    {
-      name: 'waveform',
-      color: 'white',
-      thumbnail: `/images/thumb_waveform1-white.png`,
-      url: `${assetUrl}/waveform1-white.png`,
-    },
-    {
-      name: 'waveform',
-      color: 'black',
-      thumbnail: `/images/thumb_waveform1-black.png`,
-      url: `${assetUrl}/waveform1-black.png`,
-    },
-    {
-      name: 'waveform',
-      color: 'blue',
-      thumbnail: `/images/thumb_waveform1-blue.png`,
-      url: `${assetUrl}/waveform1-blue.png`,
-    },
-    {
-      name: 'waveform',
-      color: 'red',
-      thumbnail: `/images/thumb_waveform1-red.png`,
-      url: `${assetUrl}/waveform1-red.png`,
-    },
-    {
-      name: 'waveform',
-      color: 'orange',
-      thumbnail: `/images/thumb_waveform1-orange.png`,
-      url: `${assetUrl}/waveform1-orange.png`,
-    },
-    {
-      name: 'waveform line',
-      color: 'white',
-      thumbnail: `/images/thumb_waveform2-white.png`,
-      url: `${assetUrl}/waveform2-white.png`,
-    },
-    {
-      name: 'waveform line',
-      color: 'black',
-      thumbnail: `/images/thumb_waveform2-black.png`,
-      url: `${assetUrl}/waveform2-black.png`,
-    },
-    {
-      name: 'waveform line',
-      color: 'blue',
-      thumbnail: `/images/thumb_waveform2-blue.png`,
-      url: `${assetUrl}/waveform2-blue.png`,
-    },
-    {
-      name: 'waveform line',
-      color: 'red',
-      thumbnail: `/images/thumb_waveform2-red.png`,
-      url: `${assetUrl}/waveform2-red.png`,
-    },
-    {
-      name: 'waveform line',
-      color: 'orange',
-      thumbnail: `/images/thumb_waveform2-orange.png`,
-      url: `${assetUrl}/waveform2-orange.png`,
-    },
-  ];
 
   const backgroundImages = bgImages.map((img) => ({
     ...img,
@@ -325,6 +226,10 @@ export default function Home() {
     setShowLoginPanel(false);
   };
 
+  const onLogin = () => {
+    setShowLoginPanel(false);
+    router.push('/');
+  };
   const handleTitleChange = (
     field: string,
     value:
@@ -361,7 +266,7 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
-      <Header showLogin={handleShowLogin} />
+      <Header showLogin={handleShowLogin} loginState={loginState} />
       <Toast ref={toast} />
       <main className="flex flex-grow flex-col container mx-auto p-2 flex flex-col items-center">
         <div className="text-center mt-12 mb-4">
@@ -531,10 +436,14 @@ export default function Home() {
             if (!showLoginPanel) return;
             setShowLoginPanel(false);
           }}
-          content={({}) => <SignInPanel onCancel={onCancelLogin} />}
+          content={({}) => (
+            <SignInPanel onCancel={onCancelLogin} onLogin={onLogin} />
+          )}
         ></Dialog>
       </main>
       <Footer />
     </div>
   );
-}
+};
+
+export default Home;

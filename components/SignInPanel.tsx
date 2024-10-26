@@ -6,12 +6,13 @@ import api, { apiRoot } from '@/services/api';
 
 export interface Props {
   onCancel: () => void;
+  onLogin: () => void;
 }
 
 const unverifiedMessage = `Your account is not verified. Please check your email.
     If you can't find the email, check your spam folder.
 `;
-const SignInPanel: React.FC<Props> = ({ onCancel }) => {
+const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
   const [showSignup, setShowSignup] = useState<boolean>(false);
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -25,8 +26,11 @@ const SignInPanel: React.FC<Props> = ({ onCancel }) => {
       const response = await api.post('/login', { email, password });
       console.log(response.data.message);
       const token = response.data.token;
+      //const decoded = jwtDecode<CustomClaim>(token);
       localStorage.setItem('token', token);
       axios.defaults.headers['Authorization'] = token ? `Bearer ${token}` : '';
+      //const loginState: LoginState = { logged_in: true, email: decoded.email };
+      onLogin();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.status);

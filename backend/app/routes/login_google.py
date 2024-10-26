@@ -5,11 +5,13 @@ import requests
 from app.models import User
 from flask_login import login_user
 from app.database import db
+import jwt
+from datetime import datetime, timedelta
 
 login_google_bp = Blueprint('login_google', __name__)
 
 client = WebApplicationClient(os.environ.get('GOOGLE_CLIENT_ID'))
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 @login_google_bp.route('/login/google', methods=['GET'])
 def google_login():
     google_provider_cfg = requests.get('https://accounts.google.com/.well-known/openid-configuration').json()
@@ -58,4 +60,10 @@ def google_callback():
         db.session.commit()
 
     login_user(user)
-    return redirect(os.getenv('FRONTEND_HOME', '/'))  # Redirect to the home page or dashboard
+    token = jwt.encode({
+        'user_id': user.id,
+        'email': user.email,
+        'exp': datetime.utcnow() + timedelta(hours=5)  # Token expires in 1 hour
+    }, SECRET_KEY, algorithm='HS256')
+
+    return redirect(f"{os.getenv('FRONTEND_HOME', '')}/?token={token}")  # Redirect to the home page or dashboard
