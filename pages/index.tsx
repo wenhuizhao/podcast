@@ -24,15 +24,18 @@ import DraggableTextPanel, {
   UpdateType,
 } from '@/components/DraggableTextPanel';
 import Footer from '@/components/Footer';
-import Header, { CustomClaim, LoginState } from '@/components/Header';
+import Header, { CustomClaim } from '@/components/Header';
 import SignInPanel from '@/components/SignInPanel';
 import VideoPanel from '@/components/VideoPanel';
 import { WaveformTemplate } from '@/components/WaveformTemplate';
+import { useAuth } from '@/context/AuthContext';
 import api from '@/services/api';
+import { User } from '@/types/User';
 import { jwtDecode } from 'jwt-decode';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { ProgressSpinner } from 'primereact/progressspinner';
+
 const fontFamilies = [
   'Arial',
   'Courier New',
@@ -51,24 +54,23 @@ const Home = () => {
   const [showLoginPanel, setShowLoginPanel] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>();
   const [showProgress, setShowProgress] = useState<boolean>(false);
-  // const [loginState, setLoginState] = useState<LoginState>({
-  //   logged_in: false,
-  //   email: '',
-  // });
-
+  const { setUser } = useAuth();
   const router = useRouter();
   const toast = useRef<Toast>(null);
 
   const searchParam = useSearchParams();
   console.log('home searchParam', searchParam.get('token'));
   const token = searchParam.get('token');
-  let loginState: LoginState = { logged_in: false, email: '' };
   if (token) {
     const decoded = jwtDecode<CustomClaim>(token);
     // Check token expiration
     if (decoded.exp * 1000 > Date.now()) {
-      loginState = { logged_in: true, email: decoded.email };
       localStorage.setItem('token', token || '');
+      const user: User = {
+        userId: decoded.user_id,
+        email: decoded.email,
+      };
+      setUser(user);
     } else {
       // Token has expired
       localStorage.removeItem('token');
@@ -116,7 +118,7 @@ const Home = () => {
     console.log('setImageUpload', event.files[0]);
     uploadFile(event.files[0], 'image');
   };
-  const uploadFile = async (filename: FileUploadFile, type: string) => {
+  const uploadFile = async (filename: FileUploadFile, type = 'image') => {
     const formData = new FormData();
     formData.append('file', filename);
     formData.append('type', type);
@@ -225,7 +227,6 @@ const Home = () => {
   const onCancelLogin = () => {
     setShowLoginPanel(false);
   };
-
   const onLogin = () => {
     setShowLoginPanel(false);
     router.push('/');
@@ -262,11 +263,12 @@ const Home = () => {
     }));
   };
   const handleShowLogin = () => {
+    console.log('showlogin');
     setShowLoginPanel(true);
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white min-h-screen flex flex-col items-strech">
-      <Header showLogin={handleShowLogin} loginState={loginState} />
+      <Header showLogin={handleShowLogin} />
       <Toast ref={toast} />
       <main className="flex flex-grow flex-col container mx-auto p-2 flex flex-col items-center">
         <div className="text-center mt-12 mb-4">

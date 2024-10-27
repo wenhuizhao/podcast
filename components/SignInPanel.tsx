@@ -2,7 +2,9 @@ import axios from 'axios';
 import { Message } from 'primereact/message';
 import { useState } from 'react';
 
+import { useAuth } from '@/context/AuthContext';
 import api, { apiRoot } from '@/services/api';
+import { User } from '@/types/User';
 
 export interface Props {
   onCancel: () => void;
@@ -18,6 +20,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
   const [password, setPassword] = useState<string>();
   const [passwordConfirm, setPasswordConfirm] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string | null>('');
+  const { setUser } = useAuth();
 
   const handleSignIn = async (e: React.MouseEvent<HTMLButtonElement>) => {
     console.log('handleSignIn', email, password);
@@ -30,6 +33,11 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
       localStorage.setItem('token', token);
       axios.defaults.headers['Authorization'] = token ? `Bearer ${token}` : '';
       //const loginState: LoginState = { logged_in: true, email: decoded.email };
+      const user: User = {
+        userId: response.data.userId,
+        email: response.data.email,
+      };
+      setUser(user);
       onLogin();
     } catch (error) {
       if (axios.isAxiosError(error)) {

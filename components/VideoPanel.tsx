@@ -4,6 +4,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { useEffect, useState } from 'react';
 
 import api from '@/services/api';
+import { downloadFile } from '@/utils/FileUtil';
 
 import VideoPlayer from './VideoPlayer';
 
@@ -42,14 +43,14 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ jobId, onClose }) => {
     fetchData();
   }, []);
 
-  const handleDownload = () => {
-    console.log('download', videoUrl);
-    const link = document.createElement('a');
-    link.download = 'video.mp4';
-    link.href = videoUrl;
-    link.click();
-    link.remove();
-  };
+  // const handleDownload = () => {
+  //   console.log('download', videoUrl);
+  //   const link = document.createElement('a');
+  //   link.download = 'video.mp4';
+  //   link.href = videoUrl;
+  //   link.click();
+  //   link.remove();
+  // };
 
   const tryAgain = () => {
     onClose();
@@ -81,7 +82,7 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ jobId, onClose }) => {
             <div className="flex-col m-3">
               <Panel>
                 <button
-                  onClick={handleDownload}
+                  onClick={() => downloadFile(videoUrl)}
                   className="bg-blue-400 text-white px-2 py-3 mx-1 rounded-lg shadow hover:bg-blue-600"
                 >
                   Download Video

@@ -1,19 +1,17 @@
-from flask import Blueprint, request, jsonify, url_for, redirect, send_from_directory
+from flask import Blueprint, request, jsonify, session, send_from_directory
 from app.database import db
 from app.models import User
-from itsdangerous import URLSafeTimedSerializer
 import os
 import sys
 from werkzeug.utils import secure_filename
 import threading
-import subprocess
 from app.util.s3_util import upload_file_to_s3
 from app.image.resize_image import resize
 from app.util.file_util import generate_unique_filename
 from app.video.ffmpeg import run_ffmpeg_job
-from app.services.db_service import create_job, get_job
+from app.services.db_service import create_job, get_job, jobs_by_user
 import uuid
-from flask_login import login_user
+from flask_login import current_user, login_required
 
 videos_bp = Blueprint('videos', __name__)
 jobs = {}
@@ -86,7 +84,9 @@ def create_video():
 
     # Generate a unique job ID
     job_id = str(uuid.uuid4())
-    create_job(job_id=job_id, status='processing')
+    user_id = current_user.id if current_user else None
+    session_id = get_session_id()
+    create_job(job_id=job_id, title=title, user_id = user_id, session_id = session_id, status='processing')
     #jobs[job_id] = {'status': 'processing'}
 
     # Start the ffmpeg job in a new thread
@@ -134,3 +134,18 @@ def get_job_status():
         'output': job.output,
         'error': job.error
     }), 200
+
+@videos_bp.route('jobs', methods=['GET'])
+@login_required
+def jobs():
+    print(f"currentuser:", current_user.id)
+    jobs = jobs_by_user(current_user.id)
+    jobs_data = list(map(lambda x: x.to_dict(), jobs))
+    return jsonify(jobs_data), 200
+
+
+def get_session_id():
+    session_id = session.get('id', None)
+    if session_id is None:
+        session['id'] = str(uuid.uuid4())
+    return session['id']

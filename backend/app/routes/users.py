@@ -76,7 +76,7 @@ def login():
                 'email': user.email,
                 'exp': datetime.utcnow() + timedelta(hours=5)  # Token expires in 1 hour
             }, SECRET_KEY, algorithm='HS256')
-            return jsonify({'token': token}), 200
+            return jsonify({'token': token, 'userId': user.id, 'email': user.email}), 200
         else:
             return jsonify({'message': 'Please verify your email first.'}), 422
     else:

@@ -22,8 +22,28 @@ class User(db.Model, UserMixin):
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.String(150), index=True)
+    title = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True, nullable=True)
+    session_id =db.Column(db.String(150), index=True)
     status = db.Column(db.String(150))
     output = db.Column(db.Text)
     error = db.Column(db.Text)
     time_created = db.Column(db.DateTime(timezone=True), server_default=func.now())
     time_updated = db.Column(db.DateTime(timezone=True), onupdate=func.now())
+    time_start_process = db.Column(db.DateTime(timezone=True))
+    process_host = db.Column(db.String(150))
+    process_id = db.Column(db.String(150))
+    user = db.relationship("User", backref="jobs")
+
+    def to_dict(self):
+        return {
+            'job_id': self.job_id,
+            'user_id': self.user_id,
+            'title': self.title,
+            'status': self.status,
+            'output': self.output,
+            'error': self.error,
+            'time_created': self.time_created.isoformat() if self.time_created else '',
+            'time_updated': self.time_updated.isoformat() if self.time_updated else '',
+            'time_start_process': self.time_updated.isoformat() if self.time_updated else '',
+        }
