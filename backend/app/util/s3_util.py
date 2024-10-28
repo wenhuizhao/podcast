@@ -31,3 +31,25 @@ def upload_file_to_s3(file, acl="public-read"):
     url = f'https://{bucket}.s3.amazonaws.com/{key}'
     # after upload file to s3 bucket, return filename of the uploaded file
     return url
+
+def upload_filename_to_s3(filename, acl="public-read"):
+    bucket = os.getenv("AWS_BUCKET_NAME")
+    key = generate_unique_filename(filename)
+    try:
+        s3.upload_file(
+            Filename = filename,
+            Bucket = bucket,
+            Key = key,
+            ExtraArgs={
+                "ACL": acl
+            }
+        )
+
+    except Exception as e:
+        # This is a catch all exception, edit this part to fit your needs.
+        print("Something Happened: ", e)
+        return e
+    
+    url = f'https://{bucket}.s3.amazonaws.com/{key}'
+    # after upload file to s3 bucket, return filename of the uploaded file
+    return url

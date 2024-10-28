@@ -5,7 +5,7 @@ import os
 import sys
 from werkzeug.utils import secure_filename
 import threading
-from app.util.s3_util import upload_file_to_s3
+from app.util.s3_util import upload_filename_to_s3
 from app.image.resize_image import resize
 from app.util.file_util import generate_unique_filename
 from app.video.ffmpeg import run_ffmpeg_job
@@ -43,8 +43,9 @@ def upload_file():
             output = resized_filename
         else:
             output = uniq_filename
+        s3_url = upload_filename_to_s3(output)
         # Assuming you want to return the URL of the uploaded image
-        return jsonify({'url': output}), 200
+        return jsonify({'url': s3_url}), 200
     else:
         return jsonify({'error': 'Invalid file type'}), 400
 
@@ -84,9 +85,9 @@ def create_video():
 
     # Generate a unique job ID
     job_id = str(uuid.uuid4())
-    user_id = current_user.id if current_user else None
+    user_id = current_user.id if not current_user.is_anonymous else None
     session_id = get_session_id()
-    create_job(job_id=job_id, title=title, user_id = user_id, session_id = session_id, status='processing')
+    create_job(job_id=job_id, title=title.get('text'), user_id = user_id, session_id = session_id, status='processing')
     #jobs[job_id] = {'status': 'processing'}
 
     # Start the ffmpeg job in a new thread

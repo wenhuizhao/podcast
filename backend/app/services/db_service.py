@@ -13,8 +13,8 @@ engine = db.create_engine(database_url)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def create_job(job_id, status):
-    job = Job(job_id=job_id, status=status)
+def create_job(job_id, status, title, user_id, session_id):
+    job = Job(job_id=job_id, status=status, title=title, user_id=user_id, session_id=session_id)
     session.add(job)
     session.commit()
 

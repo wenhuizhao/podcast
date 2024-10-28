@@ -29,7 +29,8 @@ def register():
     db.session.commit()
 
     token = s.dumps(user.email, salt='email-confirm')
-    verification_url = url_for('users.verify_email', token=token, _external=True)
+    #verification_url = url_for('users.verify_email', token=token, _external=True)
+    verification_url = verify_email_url(token)
 
     # Email content
     subject = "Email Verification"
@@ -136,3 +137,10 @@ def login_status():
 @login_manager.unauthorized_handler
 def unauthorized():
     return jsonify({'message': 'You must be logged in to access this resource.'}), 401
+
+
+def verify_email_url(token):
+    return f"{os.getenv('FRONTEND_HOME')}/verify_email?token={token}"
+
+def reset_password_url(token):
+    return f"{os.getenv('FRONTEND_HOME')}/reset_password?token={token}"
