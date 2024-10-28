@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, url_for, redirect, request
+from flask import Blueprint, url_for, redirect, request, jsonify
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 from app.models import User
@@ -12,6 +12,12 @@ login_google_bp = Blueprint('login_google', __name__)
 
 client = WebApplicationClient(os.environ.get('GOOGLE_CLIENT_ID'))
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+@login_google_bp.route('/test', methods=['GET'])
+def google_test():
+    test_url = url_for('login_google.google_callback', _external=True)
+    return jsonify({'url': test_url}), 200
+
 @login_google_bp.route('/login/google', methods=['GET'])
 def google_login():
     google_provider_cfg = requests.get('https://accounts.google.com/.well-known/openid-configuration').json()
@@ -19,7 +25,8 @@ def google_login():
 
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri=url_for('login_google.google_callback', _external=True),
+        #redirect_uri=url_for('login_google.google_callback', _external=True),
+        redirect_uri = google_redirect_url(),
         scope=['openid', 'email', 'profile'],
     )
     return redirect(request_uri)
@@ -34,7 +41,8 @@ def google_callback():
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
-        redirect_url=url_for('login_google.google_callback', _external=True),
+        #redirect_url=url_for('login_google.google_callback', _external=True),
+        redirect_url = google_redirect_url(),
         code=code
     )
     token_response = requests.post(
@@ -67,3 +75,6 @@ def google_callback():
     }, SECRET_KEY, algorithm='HS256')
 
     return redirect(f"{os.getenv('FRONTEND_HOME', '')}/?token={token}")  # Redirect to the home page or dashboard
+
+def google_redirect_url():
+    return f"{os.getenv('BACKEND_HOME')}/api/v1/login/google/callback"
