@@ -3,6 +3,7 @@ from app.login import login_manager
 from app.database import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import JSONB
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,6 +29,7 @@ class Job(db.Model):
     status = db.Column(db.String(150))
     output = db.Column(db.Text)
     error = db.Column(db.Text)
+    command = db.Column(JSONB)
     time_created = db.Column(db.DateTime(timezone=True), server_default=func.now())
     time_updated = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     time_start_process = db.Column(db.DateTime(timezone=True))

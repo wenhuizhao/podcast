@@ -48,7 +48,7 @@ def upload_filename_to_s3(filename, acl="public-read"):
     except Exception as e:
         # This is a catch all exception, edit this part to fit your needs.
         print("Something Happened: ", e)
-        return e
+        raise e
     
     url = f'https://{bucket}.s3.amazonaws.com/{key}'
     # after upload file to s3 bucket, return filename of the uploaded file

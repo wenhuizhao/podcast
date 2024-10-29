@@ -26,11 +26,16 @@ def jobs_by_user(user_id):
     jobs = session.execute(db.select(Job).filter_by(user_id=user_id)).scalars().all()
     return jobs
 
-def update_job(job_id, status, output=None, error=None):
+def update_job(job_id, status=None, command=None, output=None, error=None):
     job = session.execute(db.select(Job).filter_by(job_id=job_id)).scalar_one()
     #job = Job.query.filter_by(job_id=job_id).first()
-    job.status = status
-    job.output = output
-    job.error = error
+    if status:
+        job.status = status
+    if command:
+        job.command = command
+    if output:
+        job.output = output
+    if error:
+        job.error = error
     session.commit()
 

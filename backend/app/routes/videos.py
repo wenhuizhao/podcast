@@ -8,7 +8,7 @@ import threading
 from app.util.s3_util import upload_filename_to_s3
 from app.image.resize_image import resize
 from app.util.file_util import generate_unique_filename
-from app.video.ffmpeg import run_ffmpeg_job
+from app.video.ffmpeg import run_ffmpeg_job, process_ffmpeg_job
 from app.services.db_service import create_job, get_job, jobs_by_user
 import uuid
 from flask_login import current_user, login_required
@@ -120,6 +120,26 @@ def create_video():
     #thread.join()
     # Return the job ID to the client
     return jsonify({'job_id': job_id}), 200
+
+
+@videos_bp.route('/process_job/<job_id>', methods=["POST"])
+def process_job(job_id):
+    job = get_job(job_id)
+    if not job:
+        return jsonify({'error': 'Invalid job ID'}), 400
+    try:
+        thread = threading.Thread(
+            target=process_ffmpeg_job,
+            args=(
+                job_id,
+                job.command
+            )
+        )
+        thread.start()
+        return jsonify({'job_id': job_id, 'msg': 'Job start processing'}, 200)
+    except Exception as e:
+        return jsonify({'job_id': job_id, 'msg': "Error processing job"}, 500)
+
 
 @videos_bp.route('/job', methods=['GET'])
 def get_job_status():

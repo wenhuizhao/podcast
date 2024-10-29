@@ -52,7 +52,7 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
         print(f"prev_label:{prev_label}", flush=True)
         print(f"filter_complex:{filter_complex}", flush=True)
         # Build the ffmpeg command
-        command = [
+        command_run = [
             ffmpeg,
             '-y',
             '-loop', '1',
@@ -66,7 +66,19 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
         ]
         print(f"ffmpeg -y -loop 1 -i {background_image_path} -i {audio_path} -filter_complex {filter_complex} -map {prev_label} -map 1:a -shortest {output_video_path}", flush=True)
         # Run ffmpeg command
-        subprocess.run(command, check=True)
+        command= [
+            '-y',
+            '-loop', '1',
+            '-i', background_image_path,
+            '-i', audio_path,
+            '-filter_complex', filter_complex,
+            '-map', prev_label,
+            '-map', '1:a',
+            '-shortest' 
+        ]
+        update_job(job_id=job_id, command=command)
+        subprocess.run(command_run, check=True)
+
 
         # Update job status
         update_job(job_id=job_id, status = 'completed', output=output_video_path)
@@ -79,3 +91,24 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
         # jobs[job_id]['status'] = 'failed'
         # jobs[job_id]['error'] = str(e)
         traceback.print_exc()
+
+def process_ffmpeg_job(job_id, commands):
+    ffmpeg = os.getenv('FFMPEG', 'ffmpeg')
+    output_video_path = f"{os.getenv('DOWNLOAD_FOLDER')}/{job_id}.mp4"  # Adjust the output path accordingly
+
+    try:
+        command_run = [ffmpeg] + [cmd for cmd in commands] + [output_video_path]
+        print(f"ffmpeg {' '.join(commands)} {output_video_path}", flush=True)
+        # Run ffmpeg command
+        subprocess.run(command_run, check=True)
+
+        # Update job status
+        update_job(job_id=job_id, status = 'completed', output=output_video_path)
+        print(f"done process job: {job_id}")
+    except Exception as e:
+        # Update job status with error
+        update_job(job_id=job_id, status='failed', error=str(e))
+        # jobs[job_id]['status'] = 'failed'
+        # jobs[job_id]['error'] = str(e)
+        traceback.print_exc()
+
