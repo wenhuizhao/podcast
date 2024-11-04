@@ -14,7 +14,6 @@ s3 = boto3.client(
     aws_access_key_id=os.getenv('AWS_ACCESS_KEY', 'AKIAYRS2JETHFEK5G3WO'),
     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
 )
-ssm_client = boto3.client("ssm")
 
 db = SQLAlchemy()
 db_host = os.getenv('DB_HOST', 'db.notebookvideo.com')
@@ -110,3 +109,10 @@ def process_job(job_id):
     job.status = 'failed'
     session.commit()
   print(f"done process job: {job_id}")
+
+if __name__ == '__main__':
+    try:
+        job_id = sys.argv[1]
+        process_job(job_id)
+    except IndexError:
+       print("job_id is missing")

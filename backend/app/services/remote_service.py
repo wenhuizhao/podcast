@@ -1,4 +1,4 @@
-from app.services.db_service import get_active_ec2_instance, create_ec2_instance, update_job, jobs_by_instance_id
+from app.services.db_service import get_active_ec2_instance, create_ec2_instance, update_job, update_ec2_instance, jobs_by_instance_id
 from app.services.ec2_service import create_ec2_instance_and_run_job, shutdown_spot_instance
 from app.services.scheduler_service import scheduler
 import boto3
@@ -50,6 +50,7 @@ def try_shutdown_instance(job_id, region, instance_id):
     jobs = jobs_by_instance_id(instance_id)
     if len(jobs) == 0:
         print(f"no jobs in instance:{instance_id}, shutdown...")
+        update_ec2_instance(instance_id=instance_id, status='shutdown')
         shutdown_spot_instance(region=region, instance_id=instance_id)
         print("shutdown done")
     else:

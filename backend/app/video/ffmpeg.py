@@ -12,7 +12,7 @@ run_local = os.getenv('RUN_LOCAL', 'true')
 
 def escape_text(text):
     """Escape text for use in ffmpeg drawtext filter."""
-    return text.replace('\\', '\\\\').replace("'", "\\'")
+    return text.replace('\\', '\\\\').replace("'", "'\''")
 
 def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font_size, title_font_color,
                    title_location, description_text, description_font_family, description_font_size,

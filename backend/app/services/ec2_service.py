@@ -100,11 +100,9 @@ then
     apt-get update
     apt-get install -y awscli
 fi
-apt install -y python3-pip python3.10-venv
+apt install -y python3-pip
 apt install -y ffmpeg
-python3 -m venv venv
-source venv/bin/activate
-pip3 install flask_sqlalchemy boto3 psycopg2-binary
+sudo -u ubuntu pip3 install --user flask_sqlalchemy boto3 psycopg2-binary
 # Alternatively, retrieve secrets from SSM Parameter Store
 DB_USER_PASSWORD=$(aws ssm get-parameter --name db_user_password --region {region} --with-decryption --query Parameter.Value --output text)
 S3_AWS_ACCESS_KEY=$(aws ssm get-parameter --name s3_aws_access_key --region {region} --with-decryption --query Parameter.Value --output text)
