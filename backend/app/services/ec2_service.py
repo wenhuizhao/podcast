@@ -9,7 +9,11 @@ job_script_file = f"{current_folder}/process_job.py"
 
 def get_ubuntu_ami_id(region):
     """Fetches the latest Ubuntu 22.04 AMI ID for the given region."""
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2',
+                       region_name=region,
+                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
     response = ec2.describe_images(
         Owners=['099720109477'],  # Canonical, the publisher of Ubuntu
         Filters=[
@@ -43,7 +47,11 @@ def get_instance_public_ip(region, instance_id):
 
 def request_spot_instance(region, instance_type, max_price, user_data, key_name, security_group_id, iam_instance_profile_name):
     """Requests a spot instance with the given configuration."""
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2',
+                       region_name=region,
+                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
 
     response = ec2.request_spot_instances(
         InstanceCount=1,
@@ -122,7 +130,11 @@ python3 /home/ubuntu/process_job.py "{script_param}"
 
 def get_spot_request_id(region, instance_id):
     """Retrieves the spot instance request ID associated with the instance."""
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2',
+                       region_name=region,
+                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
     response = ec2.describe_instances(InstanceIds=[instance_id])
     reservations = response.get('Reservations', [])
     if reservations:
@@ -135,7 +147,11 @@ def shutdown_spot_instance(region, instance_id):
     """
     Terminates the specified spot instance and cancels the spot request if necessary.
     """
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2',
+                       region_name=region,
+                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
     
     # Cancel the spot instance request
     try:
