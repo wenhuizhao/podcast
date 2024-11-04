@@ -2,11 +2,14 @@ import os
 import subprocess
 import traceback
 from app.services.db_service import update_job
+from app.services.remote_service import run_remote
 
 logo_text='NotebookVideo.com'
 logo_font='Arial'
 logo_color='white'
 logo_size=20
+run_local = os.getenv('RUN_LOCAL', 'true')
+
 def escape_text(text):
     """Escape text for use in ffmpeg drawtext filter."""
     return text.replace('\\', '\\\\').replace("'", "\\'")
@@ -77,7 +80,10 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
             '-shortest' 
         ]
         update_job(job_id=job_id, command=command)
-        subprocess.run(command_run, check=True)
+        if run_local == 'true':
+            subprocess.run(command_run, check=True)
+        else:
+            run_remote(job_id)
 
 
         # Update job status
@@ -100,8 +106,10 @@ def process_ffmpeg_job(job_id, commands):
         command_run = [ffmpeg] + [cmd for cmd in commands] + [output_video_path]
         print(f"ffmpeg {' '.join(commands)} {output_video_path}", flush=True)
         # Run ffmpeg command
-        subprocess.run(command_run, check=True)
-
+        if run_local == 'true':
+            subprocess.run(command_run, check=True)
+        else:
+            run_remote(job_id)
         # Update job status
         update_job(job_id=job_id, status = 'completed', output=output_video_path)
         print(f"done process job: {job_id}")

@@ -1,4 +1,5 @@
 from app import create_app
+from app.services.scheduler_service import scheduler
 import sys
 
 
@@ -12,3 +13,5 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)
+    scheduler.init_app(app)
+    scheduler.start()

@@ -168,7 +168,7 @@ const Home = () => {
     // setShowVideoPanel(true);
     // return;
 
-    if (!audioFile) {
+    if (!audioFile || audioFile.name == '') {
       showToast('error', 'Not Ready', `Please upload audio file!`);
       return;
     }
