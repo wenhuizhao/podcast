@@ -22,7 +22,11 @@ def get_ubuntu_ami_id(region):
 
 def get_instance_public_ip(region, instance_id):
     """Gets the public IP address of the instance."""
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2',
+                       region_name=region,
+                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
     while True:
         response = ec2.describe_instances(InstanceIds=[instance_id])
         reservations = response.get('Reservations', [])
@@ -94,7 +98,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip3 install flask_sqlalchemy boto3 psycopg2-binary
 # Alternatively, retrieve secrets from SSM Parameter Store
-  DB_USER_PASSWORD=$(aws ssm get-parameter --name db_user_password --region {region} --with-decryption --query Parameter.Value --output text)
+DB_USER_PASSWORD=$(aws ssm get-parameter --name db_user_password --region {region} --with-decryption --query Parameter.Value --output text)
 S3_AWS_ACCESS_KEY=$(aws ssm get-parameter --name s3_aws_access_key --region {region} --with-decryption --query Parameter.Value --output text)
 
 # Export the secret as an environment variable
