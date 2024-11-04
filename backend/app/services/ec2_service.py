@@ -116,7 +116,6 @@ export AWS_SECRET_ACCESS_KEY="$S3_AWS_ACCESS_KEY"
 cat <<'EOF' > /home/ubuntu/process_job.py
 {init_script}
 EOF
-chmod +x /home/ubuntu/init_script.sh
 # Run the script with parameter
 python3 /home/ubuntu/process_job.py "{script_param}"
 """

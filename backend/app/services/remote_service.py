@@ -3,6 +3,7 @@ from app.services.ec2_service import create_ec2_instance_and_run_job, shutdown_s
 from app.services.scheduler_service import scheduler
 import boto3
 import time
+import os
 from datetime import datetime, timedelta
 
 def get_command_output(ssm, instance_id, command_id):
@@ -25,7 +26,11 @@ def get_command_output(ssm, instance_id, command_id):
 
 def run_command_ssm(region, instance_ids, command):
     """Runs a command on the instance(s) via SSM Run Command."""
-    ssm = boto3.client('ssm', region_name=region)
+    ssm = boto3.client('ssm', 
+                        region_name=region,
+                        aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                      )
     response = ssm.send_command(
         InstanceIds=instance_ids,
         DocumentName="AWS-RunShellScript",
@@ -63,7 +68,11 @@ def run_remote(job_id):
   ec2_instance = get_active_ec2_instance()
   if ec2_instance:
     update_job(job_id=job_id, instance_id=ec2_instance.instance_id, status='processing')
-    ssm_client = boto3.client("ssm")
+    ssm_client = boto3.client("ssm",
+                                region_name=ec2_instance.region,
+                                aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
+                                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                              )
     db_user_password_param = ssm_client.get_parameter(Name='db_user_password')
     db_user_password = db_user_password_param["Parameter"]["Value"]
     aws_access_key_param = ssm_client.get_parameter(Name='s3_aws_access_key')
