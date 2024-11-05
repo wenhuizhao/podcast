@@ -115,7 +115,7 @@ cat <<'EOF' > /home/ubuntu/process_job.py
 {init_script}
 EOF
 # Run the script with parameter
-python3 /home/ubuntu/process_job.py "{script_param}"
+sudo -u ubuntu python3 /home/ubuntu/process_job.py "{script_param}"
 """
 
     instance_id = request_spot_instance(region, instance_type, max_price, user_data, key_name, security_group_id, iam_instance_profile_name)
