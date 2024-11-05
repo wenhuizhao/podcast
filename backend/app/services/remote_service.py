@@ -78,7 +78,7 @@ def run_remote(job_id):
     db_user_password = db_user_password_param["Parameter"]["Value"]
     aws_access_key_param = ssm_client.get_parameter(Name='s3_aws_access_key')
     aws_access_key = aws_access_key_param["Parameter"]["Value"]
-    job_command = f"su - ubuntu -c 'DB_PASSWORD={db_user_password} AWS_SECRET_ACCESS_KEY={aws_access_key} python3 /home/ubuntu/process_job.py {job_id} &> out"
+    job_command = f"su - ubuntu -c 'DB_PASSWORD={db_user_password} AWS_SECRET_ACCESS_KEY={aws_access_key} python3 /home/ubuntu/process_job.py {job_id} &> out'"
     run_command_ssm(ec2_instance.region, [ec2_instance.instance_id], job_command)
     return
   
