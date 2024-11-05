@@ -82,14 +82,10 @@ def run_ffmpeg_job(job_id, audio_path, title_text, title_font_family, title_font
         update_job(job_id=job_id, command=command)
         if run_local == 'true':
             subprocess.run(command_run, check=True)
+            update_job(job_id=job_id, status = 'completed', output=output_video_path)
         else:
             run_remote(job_id)
 
-
-        # Update job status
-        update_job(job_id=job_id, status = 'completed', output=output_video_path)
-        # jobs[job_id]['status'] = 'completed'
-        # jobs[job_id]['output'] = output_video_path
 
     except Exception as e:
         # Update job status with error
