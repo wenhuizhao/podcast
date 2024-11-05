@@ -80,6 +80,14 @@ def run_remote(job_id):
     aws_access_key = aws_access_key_param["Parameter"]["Value"]
     job_command = f"su - ubuntu -c 'DB_PASSWORD={db_user_password} AWS_SECRET_ACCESS_KEY={aws_access_key} python3 /home/ubuntu/process_job.py {job_id} &> out'"
     run_command_ssm(ec2_instance.region, [ec2_instance.instance_id], job_command)
+    run_time = datetime.utcnow() + timedelta(seconds=45*60)
+    scheduler.add_job(
+      id=job_id,
+      func=try_shutdown_instance,
+      trigger='date',
+      run_date=run_time,
+      args=[job_id, ec2_instance.region, ec2_instance.instance_id]
+    )
     return
   
   instance_id, public_ip, region = create_ec2_instance_and_run_job(job_id)
