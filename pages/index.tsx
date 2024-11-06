@@ -326,12 +326,13 @@ const Home = () => {
                 />
               </div>
               <FileUpload
-                mode="basic"
+                mode="advanced"
                 accept="image/*"
                 maxFileSize={10000000}
                 customUpload
                 uploadHandler={onImageUpload}
-                chooseLabel="Upload Background Image"
+                chooseLabel="Choose Background Image"
+                removeIcon="pi pi-trash"
                 className="w-full max-w-md custom-file-upload"
               />
             </div>
@@ -402,12 +403,13 @@ const Home = () => {
               </Panel>
               <div className="flex flex-col mt-5 items-center space-x-6">
                 <FileUpload
-                  mode="basic"
+                  mode="advanced"
                   accept="audio/*"
                   maxFileSize={10000000}
                   customUpload
                   uploadHandler={onAudioUpload}
-                  chooseLabel="Upload Audio File"
+                  chooseLabel="Choose Audio File"
+                  removeIcon="pi pi-trash"
                   className="ml-4 mb-3 max-w-md custom-file-upload"
                 />
                 <button

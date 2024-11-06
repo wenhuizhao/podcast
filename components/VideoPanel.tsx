@@ -10,13 +10,14 @@ import VideoPlayer from './VideoPlayer';
 
 export interface VideoPanelProps {
   jobId: string | undefined;
+  timeId: ReturnType<typeof setTimeout>;
   onClose: () => void;
 }
 const VideoPanel: React.FC<VideoPanelProps> = ({ jobId, onClose }) => {
   const [showProgress, setShowProgress] = useState<boolean>(true);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-
+  let timeoutId: ReturnType<typeof setTimeout>;
   useEffect(() => {
     const fetchData = async () => {
       setShowProgress(true);
@@ -30,7 +31,7 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ jobId, onClose }) => {
           setShowErrorMessage(true);
           setShowProgress(false);
         } else if (response.data.status === 'processing') {
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             fetchData();
           }, 2000); //poll job status every 2 seconds
         }
@@ -53,6 +54,7 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ jobId, onClose }) => {
   // };
 
   const tryAgain = () => {
+    clearTimeout(timeoutId);
     onClose();
   };
   return (
