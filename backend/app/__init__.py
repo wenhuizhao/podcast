@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask
 from app.database import db
 from dotenv import load_dotenv
@@ -5,12 +6,15 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 import os
 import sys
+from app.constant import SESSION_EXPIRATION_IN_HOURS
 
 
 def create_app():
     load_dotenv()
     app = Flask(__name__)
+    app.config['SESSION_PERMANENT'] = True
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # Replace with your secret key
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=SESSION_EXPIRATION_IN_HOURS) 
     # app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
     # app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to the session cookie
     # app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Adjust as needed ('Strict', 'Lax', 'None')

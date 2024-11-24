@@ -52,6 +52,9 @@ const Home = () => {
   const [audioUrl, setAudioUrl] = useState<string>('');
   const [showVideoPanel, setShowVideoPanel] = useState<boolean>(false);
   const [showLoginPanel, setShowLoginPanel] = useState<boolean>(false);
+  const [infoMessage, setInfoMessage] = useState<string | null>();
+  const [fromVideoGeneration, setFromVideoGeneration] =
+    useState<boolean>(false);
   const [jobId, setJobId] = useState<string>();
   const [showProgress, setShowProgress] = useState<boolean>(false);
   const { setUser } = useAuth();
@@ -62,6 +65,7 @@ const Home = () => {
   console.log('home searchParam', searchParam.get('token'));
   const token = searchParam.get('token');
   if (token) {
+    // user is redirect back to homepage after login using google account
     const decoded = jwtDecode<CustomClaim>(token);
     // Check token expiration
     if (decoded.exp * 1000 > Date.now()) {
@@ -71,11 +75,20 @@ const Home = () => {
         email: decoded.email,
       };
       setUser(user);
+      api
+        .post('/sync_session_jobs')
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => console.log(error))
+        .finally(() => {
+          router.push('/jobs');
+        });
     } else {
       // Token has expired
       localStorage.removeItem('token');
+      router.push('/');
     }
-    router.push('/');
   }
 
   const [titleState, setTitleState] = useState<FontType>({
@@ -175,8 +188,9 @@ const Home = () => {
     console.log('handleGenerateVideo');
     try {
       const response = await api.post(
-        '/generate_video',
+        '/generate_preview_video',
         {
+          job_id: jobId,
           audio: audioUrl,
           backgroundImageUrl: backgroundImageUrl,
           waveformImageUrl: waveformImageUrl,
@@ -227,9 +241,12 @@ const Home = () => {
   const onCancelLogin = () => {
     setShowLoginPanel(false);
   };
-  const onLogin = () => {
+  const onLogin = async (fromVideoGeneration: boolean) => {
     setShowLoginPanel(false);
-    router.push('/');
+    if (fromVideoGeneration) {
+      const response = await api.post('/sync_session_jobs');
+    }
+    router.push('/jobs');
   };
   const handleTitleChange = (
     field: string,
@@ -264,6 +281,13 @@ const Home = () => {
   };
   const handleShowLogin = () => {
     console.log('showlogin');
+    setShowLoginPanel(true);
+  };
+  const onNeedLogin = () => {
+    setInfoMessage(
+      "The video may take a few minutes to tens of minutes. Please login so that you won't lose the video and can check the status later."
+    );
+    setFromVideoGeneration(true);
     setShowLoginPanel(true);
   };
   return (
@@ -431,7 +455,11 @@ const Home = () => {
             setShowVideoPanel(false);
           }}
         >
-          <VideoPanel jobId={jobId} onClose={closeVideoPanel} />
+          <VideoPanel
+            jobId={jobId}
+            onClose={closeVideoPanel}
+            onNeedLogin={onNeedLogin}
+          />
         </Dialog>
         <Dialog
           visible={showLoginPanel}
@@ -441,7 +469,12 @@ const Home = () => {
             setShowLoginPanel(false);
           }}
           content={({}) => (
-            <SignInPanel onCancel={onCancelLogin} onLogin={onLogin} />
+            <SignInPanel
+              onCancel={onCancelLogin}
+              onLogin={onLogin}
+              infoMessage={infoMessage}
+              fromVideoGeneration={fromVideoGeneration}
+            />
           )}
         ></Dialog>
       </main>

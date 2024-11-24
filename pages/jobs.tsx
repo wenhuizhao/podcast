@@ -17,13 +17,19 @@ import 'primereact/resources/primereact.min.css'; // Core CSS
 import 'primereact/resources/themes/lara-light-indigo/theme.css'; // Theme
 
 interface Job {
+  job_id: string;
   title: string;
   time_created: string;
   time_updated: string;
   time_start_process: string;
   status: string;
+  mode: string;
   output: string;
   error: string;
+}
+
+interface JobTimeoutId {
+  [key: string]: ReturnType<typeof setTimeout>;
 }
 
 const JobListPage = () => {
@@ -31,6 +37,7 @@ const JobListPage = () => {
   const { setUser } = useAuth();
   const [errorMessage, setErrorMessage] = useState();
   const router = useRouter();
+  let timeoutIds: JobTimeoutId = {};
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -52,13 +59,53 @@ const JobListPage = () => {
       }
     };
     fetchJobs();
+
+    return () => {
+      Object.keys(timeoutIds).forEach((jobId) => {
+        clearTimeout(timeoutIds[jobId]);
+      });
+    };
   }, []);
-  const getStatusBadge = (status: string) => {
+
+  const fetchJobStatus = async (jobId: string) => {
+    try {
+      const resp: { data: Job } = await api.get(`/job?job_id=${jobId}`);
+      console.log('fetchJobstatus,resp:', resp);
+      if (resp.data.status != 'processing') {
+        clearTimeout(timeoutIds[jobId]);
+      }
+      const newJobs: Job[] = jobs.map((job) => {
+        if (job.job_id == jobId) {
+          return resp.data;
+        } else {
+          return job;
+        }
+      });
+      console.log('newJobs:', newJobs);
+      setJobs(newJobs);
+    } catch (error) {
+      clearTimeout(timeoutIds[jobId]);
+      console.log(error);
+    }
+  };
+
+  const generateFullVideo = async (jobId: string) => {
+    const resp = await api.post(`/generate_full_video/${jobId}`);
+    timeoutIds[jobId] = setInterval(() => {
+      fetchJobStatus(jobId);
+    }, 5000);
+    fetchJobStatus(jobId);
+  };
+  const getStatusBadge = (status: string, mode: string) => {
     switch (status) {
       case 'processing':
         return <Badge value="In Progress" severity="info" />;
       case 'completed':
-        return <Badge value="Completed" severity="success" />;
+        if (mode == 'full') {
+          return <Badge value="Completed" severity="success" />;
+        } else {
+          return <Badge value="Preview" severity="secondary" />;
+        }
       case 'failed':
         return <Badge value="Failed" severity="danger" />;
       default:
@@ -130,16 +177,30 @@ const JobListPage = () => {
 
                 <div className="flex items-center gap-4">
                   {/* Status Badge */}
-                  {getStatusBadge(job.status)}
+                  {getStatusBadge(job.status, job.mode)}
 
                   {/* Download Button */}
-                  {job.status === 'completed' && (
+                  {job.status === 'completed' && job.mode === 'full' && (
                     <Button
                       icon="pi pi-download"
                       label="Download"
                       className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition"
                       onClick={() => downloadFile(job.output)}
                     />
+                  )}
+                  {job.status === 'completed' && job.mode === 'preview' && (
+                    <Button
+                      icon="pi pi-video"
+                      label="Generate Full Video"
+                      className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition"
+                      onClick={() => generateFullVideo(job.job_id)}
+                    />
+                  )}
+                  {job.status === 'processing' && (
+                    <i
+                      className="pi pi-spin pi-spinner"
+                      style={{ fontSize: '2rem' }}
+                    ></i>
                   )}
                 </div>
               </div>

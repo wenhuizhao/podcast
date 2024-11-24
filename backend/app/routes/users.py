@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, url_for, redirect, send_from_directory
+from flask import Blueprint, request, session, jsonify, url_for, redirect, send_from_directory
 from app.database import db
 from app.models import User
 from app.encrypt import bcrypt
@@ -7,8 +7,11 @@ from itsdangerous import URLSafeTimedSerializer
 import os
 from flask_login import login_user, current_user, logout_user
 from app.login import login_manager
+from app.constant import SESSION_EXPIRATION_IN_HOURS
 import jwt
 from datetime import datetime, timedelta
+from app.services.scheduler_service import scheduler
+import pytz
 
 users_bp = Blueprint('users', __name__)
 
@@ -75,7 +78,7 @@ def login():
             token = jwt.encode({
                 'user_id': user.id,
                 'email': user.email,
-                'exp': datetime.utcnow() + timedelta(hours=5)  # Token expires in 1 hour
+                'exp': datetime.utcnow() + timedelta(hours=SESSION_EXPIRATION_IN_HOURS)  # Token expires in 1 hour
             }, SECRET_KEY, algorithm='HS256')
             return jsonify({'token': token, 'userId': user.id, 'email': user.email}), 200
         else:
@@ -85,7 +88,10 @@ def login():
 
 @users_bp.route('/logout', methods=['POST'])
 def logout():
+    user_id = "test-user-id"
     logout_user()
+    if 'id' in session:
+        session.pop('id', None)    
     return jsonify({'message': 'Logged out successfully.'}), 200
 
 @users_bp.route('/reset-password', methods=['POST'])

@@ -8,20 +8,33 @@ import { User } from '@/types/User';
 
 export interface Props {
   onCancel: () => void;
-  onLogin: () => void;
+  onLogin: (fromVideoGeneration: boolean) => void;
+  infoMessage: string | null | undefined;
+  fromVideoGeneration: boolean;
 }
 
 const unverifiedMessage = `Your account is not verified. Please check your email.
     If you can't find the email, check your spam folder.
 `;
-const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
+const SignInPanel: React.FC<Props> = ({
+  onCancel,
+  onLogin,
+  infoMessage,
+  fromVideoGeneration,
+}) => {
   const [showSignup, setShowSignup] = useState<boolean>(false);
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [passwordConfirm, setPasswordConfirm] = useState<string>();
-  const [errorMessage, setErrorMessage] = useState<string | null>('');
+  const [message, setMessage] = useState<string | null | undefined>(
+    infoMessage
+  );
+  const [messageType, setMessageType] = useState<
+    'info' | 'success' | 'warn' | 'error' | 'secondary' | 'contrast'
+  >('info');
   const { setUser } = useAuth();
 
+  console.log('infomessage', infoMessage);
   const handleSignIn = async (e: React.MouseEvent<HTMLButtonElement>) => {
     console.log('handleSignIn', email, password);
     e.preventDefault();
@@ -38,17 +51,19 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
         email: response.data.email,
       };
       setUser(user);
-      onLogin();
+      onLogin(fromVideoGeneration);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.status);
         console.error(error.response);
         if (error.status === 422) {
           //account is not verified.
-          setErrorMessage(unverifiedMessage);
+          setMessage(unverifiedMessage);
+          setMessageType('warn');
         } else {
           console.log(error.response?.data.message);
-          setErrorMessage(error.response?.data.message);
+          setMessage(error.response?.data.message);
+          setMessageType('error');
         }
       } else {
         console.error(error);
@@ -65,18 +80,23 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
 
     console.log(password, passwordConfirm);
     if (password !== passwordConfirm) {
-      setErrorMessage('Password need match passwordConfirm');
+      setMessage('Password need match passwordConfirm');
+      setMessageType('error');
       return;
     }
     console.log('handleSignup', email, password);
     try {
       const response = await api.post('/register', { email, password });
       console.log(response.data.message);
+      setMessage(response.data.message);
+      setMessageType('success');
+      setShowSignup(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error.status);
         console.error(error.response);
-        setErrorMessage(error.response?.data.message);
+        setMessage(error.response?.data.message);
+        setMessageType('error');
       } else {
         console.error(error);
       }
@@ -86,7 +106,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
       {!showSignup && (
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 rounded-xl shadow-lg max-w-md w-full">
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-xl shadow-lg max-w-lg w-full">
           <div className="flex justify-center mb-6">
             <a
               href="#"
@@ -94,21 +114,8 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
             >
               Sign In
             </a>
-            {/* <a
-            href="#"
-            className="text-white text-lg font-semibold hover:underline"
-          >
-            Sign Up
-          </a> */}
           </div>
           <div className="flex justify-center m-4">
-            {/* <a
-              href="#"
-              onClick={handleGoogleLogin}
-              className="text-white text-lg font-semibold hover:underline"
-            >
-              Login by google
-            </a> */}
             <button
               type="button"
               className="google-sign-in-button"
@@ -118,15 +125,15 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
             </button>
           </div>
           <form className="space-y-6">
-            <div className="flex justify-center">
-              {errorMessage && (
+            {message && (
+              <div className="flex justify-center">
                 <Message
                   className="inline-flex flex-column gap-2"
-                  severity="error"
-                  text={errorMessage}
+                  severity={messageType}
+                  text={message}
                 />
-              )}
-            </div>
+              </div>
+            )}
             <div>
               <label className="block text-white text-sm font-medium">
                 Email
@@ -138,7 +145,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
                 placeholder="Enter your email"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setEmail(e.target.value);
-                  setErrorMessage('');
+                  setMessage('');
                 }}
               />
             </div>
@@ -153,7 +160,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
                 placeholder="Enter your password"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setPassword(e.target.value);
-                  setErrorMessage('');
+                  setMessage('');
                 }}
               />
             </div>
@@ -191,7 +198,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
         </div>
       )}
       {showSignup && (
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 rounded-xl shadow-lg max-w-md w-full">
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-xl shadow-lg max-w-lg w-full">
           <div className="flex justify-center mb-6">
             <a
               href="#"
@@ -201,15 +208,15 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
             </a>
           </div>
           <form className="space-y-6">
-            <div className="flex justify-center">
-              {errorMessage && (
+            {message && (
+              <div className="flex justify-center">
                 <Message
                   className="inline-flex flex-column gap-2"
-                  severity="error"
-                  text={errorMessage}
+                  severity={messageType}
+                  text={message}
                 />
-              )}
-            </div>
+              </div>
+            )}
             <div>
               <label className="block text-white text-sm font-medium">
                 Email
@@ -221,7 +228,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
                 placeholder="Enter your email"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setEmail(e.target.value);
-                  setErrorMessage('');
+                  setMessage('');
                 }}
               />
             </div>
@@ -236,7 +243,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
                 placeholder="Enter your password"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setPassword(e.target.value);
-                  setErrorMessage('');
+                  setMessage('');
                 }}
               />
             </div>
@@ -251,7 +258,7 @@ const SignInPanel: React.FC<Props> = ({ onCancel, onLogin }) => {
                 placeholder="Enter your passwordConfirm"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setPasswordConfirm(e.target.value);
-                  setErrorMessage('');
+                  setMessage('');
                 }}
               />
             </div>

@@ -27,6 +27,7 @@ class Job(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True, nullable=True)
     session_id =db.Column(db.String(150), index=True)
     status = db.Column(db.String(150))
+    mode = db.Column(db.String(150))
     output = db.Column(db.Text)
     error = db.Column(db.Text)
     instance_id = db.Column(db.String(150), index=True)
@@ -44,6 +45,7 @@ class Job(db.Model):
             'user_id': self.user_id,
             'title': self.title,
             'status': self.status,
+            'mode': self.mode,
             'output': self.output,
             'error': self.error,
             'time_created': self.time_created.isoformat() if self.time_created else '',

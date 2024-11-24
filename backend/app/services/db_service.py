@@ -2,6 +2,7 @@ from app.database import db
 from app.models import Job, Ec2Instance
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import desc
 import os
 
 db_host = os.getenv('DB_HOST', 'localhost')
@@ -14,8 +15,8 @@ engine = db.create_engine(database_url)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def create_job(job_id, status, title, user_id, session_id):
-    job = Job(job_id=job_id, status=status, title=title, user_id=user_id, session_id=session_id)
+def create_job(job_id, status, mode, title, user_id, session_id):
+    job = Job(job_id=job_id, status=status, mode=mode, title=title, user_id=user_id, session_id=session_id)
     session.add(job)
     session.commit()
 
@@ -28,18 +29,31 @@ def get_job(job_id):
         return None
 
 def jobs_by_user(user_id):
-    jobs = session.execute(db.select(Job).filter_by(user_id=user_id)).scalars().all()
+    jobs = session.execute(db.select(Job).filter_by(user_id=user_id).order_by(desc(Job.time_created))).scalars().all()
     return jobs
 
 def jobs_by_instance_id(instance_id, status = 'processing'):
     jobs = session.execute(db.select(Job).filter_by(instance_id=instance_id, status=status)).scalars().all()
     return jobs
 
-def update_job(job_id, status=None, command=None, instance_id=None, output=None, error=None):
+def jobs_by_session_id(session_id):
+    jobs = session.execute(db.select(Job).filter_by(session_id=session_id)).scalars().all()
+    return jobs
+
+def update_job(job_id, user_id=None, session_id=None, title=None, status=None, mode=None, command=None, 
+               instance_id=None, output=None, error=None, time_start_process=None):
     job = session.execute(db.select(Job).filter_by(job_id=job_id)).scalar_one()
     #job = Job.query.filter_by(job_id=job_id).first()
+    if user_id:
+        job.user_id = user_id
+    if session_id:
+        job.session_id = session_id
+    if title:
+        job.title = title
     if status:
         job.status = status
+    if mode:
+        job.mode = mode
     if command:
         job.command = command
     if instance_id:
@@ -48,6 +62,8 @@ def update_job(job_id, status=None, command=None, instance_id=None, output=None,
         job.output = output
     if error:
         job.error = error
+    if time_start_process is not None:
+        job.time_start_process= time_start_process
     session.commit()
 
 def create_ec2_instance(instance_id, region, ip_addr, status):

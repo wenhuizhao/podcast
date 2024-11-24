@@ -9,7 +9,7 @@ from app.util.s3_util import upload_filename_to_s3
 from app.image.resize_image import resize
 from app.util.file_util import generate_unique_filename
 from app.video.ffmpeg import run_ffmpeg_job, process_ffmpeg_job
-from app.services.db_service import create_job, get_job, jobs_by_user
+from app.services.db_service import create_job, get_job, jobs_by_user, update_job, jobs_by_session_id
 import uuid
 from flask_login import current_user, login_required
 
@@ -59,7 +59,7 @@ def download_file(filename):
     return send_from_directory(os.getenv('DOWNLOAD_FOLDER'), filename)
 
 
-@videos_bp.route('/generate_video', methods=['POST'])
+@videos_bp.route('/generate_preview_video', methods=['POST'])
 def create_video():
     """Endpoint to create a video."""
     data = request.get_json()
@@ -80,15 +80,22 @@ def create_video():
     description_location = description.get('position')  # Should be a list or tuple [x, y]
     background_image_path = data.get('backgroundImageUrl')
     waveform_color = data.get('waveformColor')
+    preview = True
 
-    # Validate required parameters (omitted for brevity)
-
-    # Generate a unique job ID
-    job_id = str(uuid.uuid4())
+    if preview:
+        print("preview mode")
+    else:
+        print("non preview mode")
     user_id = current_user.id if not current_user.is_anonymous else None
     session_id = get_session_id()
-    create_job(job_id=job_id, title=title.get('text'), user_id = user_id, session_id = session_id, status='processing')
-    #jobs[job_id] = {'status': 'processing'}
+    # Validate required parameters (omitted for brevity)
+    if data.get('job_id'):
+        job_id = data.get('job_id')
+        update_job(job_id, user_id=user_id, session_id = session_id, status='processing', mode="preview")
+    else:
+        # Generate a unique job ID
+        job_id = str(uuid.uuid4())
+        create_job(job_id=job_id, title=title.get('text'), user_id = user_id, session_id = session_id, status='processing', mode='preview')
 
     # Start the ffmpeg job in a new thread
     print(f"audio:{audio_path}, title text:{title_text}, fontfamily:{title_font_family}")
@@ -113,7 +120,8 @@ def create_video():
             description_font_color,
             description_location,
             background_image_path,
-            waveform_color
+            waveform_color,
+            preview
         )
     )
     thread.start()
@@ -122,11 +130,13 @@ def create_video():
     return jsonify({'job_id': job_id}), 200
 
 
-@videos_bp.route('/process_job/<job_id>', methods=["POST"])
-def process_job(job_id):
+@videos_bp.route('/generate_full_video/<job_id>', methods=["POST"])
+def generate_full_video(job_id):
     job = get_job(job_id)
     if not job:
         return jsonify({'error': 'Invalid job ID'}), 400
+    if current_user.is_anonymous or job.user_id != current_user.id:
+        return jsonify('Unauthorized', 401)
     try:
         thread = threading.Thread(
             target=process_ffmpeg_job,
@@ -151,9 +161,14 @@ def get_job_status():
 
     return jsonify({
         'job_id': job_id,
+        'title': job.title,
         'status': job.status,
+        'mode': job.mode,
         'output': job.output,
-        'error': job.error
+        'error': job.error,
+        'time_created': job.time_created,
+        'time_updated': job.time_updated,
+        'time_start_process': job.time_start_process
     }), 200
 
 @videos_bp.route('jobs', methods=['GET'])
@@ -163,6 +178,16 @@ def jobs():
     jobs = jobs_by_user(current_user.id)
     jobs_data = list(map(lambda x: x.to_dict(), jobs))
     return jsonify(jobs_data), 200
+
+@videos_bp.route('sync_session_jobs', methods=['POST'])
+@login_required
+def sync_session_jobs():
+    session_id = get_session_id()
+    jobs = jobs_by_session_id(session_id)
+    for job in jobs:
+        if not job.user_id:
+            update_job(job.job_id, user_id=current_user.id)
+    return jsonify({}, 200)
 
 
 def get_session_id():

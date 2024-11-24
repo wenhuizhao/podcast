@@ -88,7 +88,13 @@ def process_job(job_id):
     if job.status == 'completed' and not job.output == None:
        print(f"job:{job_id} already processed")
        return
-    commands = job.command
+    origin_commands = job.command
+    index = origin_commands.index('-t')
+    if job.mode == 'full' and index != -1 and index + 1 < len(origin_commands):
+        commands = origin_commands[:index] + origin_commands[index+2:]
+    else:
+        commands = origin_commands
+
     job.status = 'processing'
     session.commit()
     command_run = [ffmpeg] + [cmd for cmd in commands] + [output_video_path]

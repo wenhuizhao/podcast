@@ -17,23 +17,23 @@ const VerifyEmail: React.FC = () => {
   console.log('verify email searchParam', searchParam.get('token'));
   const token = searchParam.get('token');
 
-  useEffect(() => {
-    const verifyEmail = async () => {
-      try {
-        const resp = await api.get(`/verify-email/${token}`);
-        console.log(resp);
-        setSeverity('success');
-        setMessage(resp.data.message);
-      } catch (error) {
-        setSeverity('error');
-        if (axios.isAxiosError(error)) {
-          setMessage(error.response?.data.message);
-          console.log(error);
-        } else {
-          setMessage('something wrong when reset password');
-        }
+  const verifyEmail = async () => {
+    try {
+      const resp = await api.get(`/verify-email/${token}`);
+      console.log(resp);
+      setSeverity('success');
+      setMessage(resp.data.message);
+    } catch (error) {
+      setSeverity('error');
+      if (axios.isAxiosError(error)) {
+        setMessage(error.response?.data.message);
+        console.log(error);
+      } else {
+        setMessage('something wrong when reset password');
       }
-    };
+    }
+  };
+  useEffect(() => {
     if (token) {
       verifyEmail();
     }
@@ -46,6 +46,9 @@ const VerifyEmail: React.FC = () => {
         <h2 className="text-lg font-bold m-5">Verify Email</h2>
         <div>
           <Message severity={severity} text={message} />
+          {!message && (
+            <button onClick={verifyEmail}>Click to verify my email.</button>
+          )}
         </div>
       </main>
       <Footer />

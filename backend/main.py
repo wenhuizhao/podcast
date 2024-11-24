@@ -12,6 +12,6 @@ app = create_app()
 # login_manager.login_view = 'login'
 
 if __name__ == '__main__':
-    app.run(debug=True)
     scheduler.init_app(app)
     scheduler.start()
+    app.run(debug=True)

@@ -3,8 +3,10 @@ from app.services.ec2_service import create_ec2_instance_and_run_job, shutdown_s
 from app.services.scheduler_service import scheduler
 import boto3
 import time
+import pytz
 import os
 from datetime import datetime, timedelta
+from app.constant import SPOT_INSTANCE_IDLE_TIME_IN_MIN
 
 def get_command_output(ssm, instance_id, command_id):
     """Retrieves the output of the SSM command."""
@@ -54,7 +56,7 @@ def try_shutdown_instance(job_id, region, instance_id):
         shutdown_spot_instance(region=region, instance_id=instance_id)
         print("shutdown done")
     else:
-      run_time = datetime.utcnow() + timedelta(seconds=45*60)
+      run_time = datetime.now(pytz.utc) + timedelta(seconds=SPOT_INSTANCE_IDLE_TIME_IN_MIN*60)
       print("Job running in instance:{instance_id}, reschedule shutdown at: {run_time}")
       scheduler.add_job(
         id=job_id,
@@ -80,7 +82,7 @@ def run_remote(job_id):
     aws_access_key = aws_access_key_param["Parameter"]["Value"]
     job_command = f"su - ubuntu -c 'DB_PASSWORD={db_user_password} AWS_SECRET_ACCESS_KEY={aws_access_key} python3 /home/ubuntu/process_job.py {job_id} &> out'"
     run_command_ssm(ec2_instance.region, [ec2_instance.instance_id], job_command)
-    run_time = datetime.utcnow() + timedelta(seconds=45*60)
+    run_time = datetime.now(pytz.utc) + timedelta(seconds=SPOT_INSTANCE_IDLE_TIME_IN_MIN*60)
     scheduler.add_job(
       id=job_id,
       func=try_shutdown_instance,
@@ -95,7 +97,8 @@ def run_remote(job_id):
   update_job(job_id=job_id, instance_id=instance_id, status='processing')
 
   #schedule job to shut down ec2 spot instance after 45 minutes.
-  run_time = datetime.utcnow() + timedelta(seconds=45*60)
+  run_time = datetime.now(pytz.utc) + timedelta(seconds=SPOT_INSTANCE_IDLE_TIME_IN_MIN*60)
+  
   scheduler.add_job(
     id=job_id,
     func=try_shutdown_instance,
