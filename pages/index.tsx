@@ -244,7 +244,7 @@ const Home = () => {
   const onLogin = async (fromVideoGeneration: boolean) => {
     setShowLoginPanel(false);
     if (fromVideoGeneration) {
-      const response = await api.post('/sync_session_jobs');
+      await api.post('/sync_session_jobs');
     }
     router.push('/jobs');
   };

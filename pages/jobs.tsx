@@ -37,7 +37,7 @@ const JobListPage = () => {
   const { setUser } = useAuth();
   const [errorMessage, setErrorMessage] = useState();
   const router = useRouter();
-  let timeoutIds: JobTimeoutId = {};
+  const timeoutIds: JobTimeoutId = {};
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -90,7 +90,7 @@ const JobListPage = () => {
   };
 
   const generateFullVideo = async (jobId: string) => {
-    const resp = await api.post(`/generate_full_video/${jobId}`);
+    await api.post(`/generate_full_video/${jobId}`);
     timeoutIds[jobId] = setInterval(() => {
       fetchJobStatus(jobId);
     }, 5000);

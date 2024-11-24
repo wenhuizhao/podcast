@@ -82,7 +82,7 @@ const VideoPanel: React.FC<VideoPanelProps> = ({
     console.log('start to generate full video');
     try {
       setShowProgress(true);
-      const response = await api.post(`/generate_full_video/${jobId}`);
+      await api.post(`/generate_full_video/${jobId}`);
       router.push('/jobs');
     } catch (err) {
       console.log(err);
