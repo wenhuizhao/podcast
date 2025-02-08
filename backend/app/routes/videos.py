@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session, send_from_directory
+from flask import Blueprint, current_app, request, jsonify, session, send_from_directory
 from app.database import db
 from app.models import User
 import os
@@ -12,6 +12,8 @@ from app.video.ffmpeg import run_ffmpeg_job, process_ffmpeg_job
 from app.services.db_service import create_job, get_job, jobs_by_user, update_job, jobs_by_session_id
 import uuid
 from flask_login import current_user, login_required
+import boto3
+from botocore.exceptions import ClientError
 
 videos_bp = Blueprint('videos', __name__)
 jobs = {}
@@ -19,6 +21,41 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'wav', 'mp3'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@videos_bp.route('/get_presigned_url', methods=['GET'])
+def get_presigned_url():
+    # Get the desired file extension from the query string (default to wav)
+    file_extension = request.args.get('file_extension', 'wav')
+    
+    # Generate a unique filename using uuid4
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    
+    bucket_name = current_app.config['S3_BUCKET']
+    region = current_app.config['S3_REGION']
+    
+    s3_client = boto3.client(
+        's3',
+        region_name=region,
+        aws_access_key_id=current_app.config['AWS_ACCESS_KEY'],
+        aws_secret_access_key=current_app.config['AWS_SECRET_KEY']
+    )
+    
+    try:
+        # Generate a presigned URL that allows an HTTP PUT to the specified bucket/key.
+        presigned_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': unique_filename,
+                'ContentType': 'audio/wav'
+            },
+            ExpiresIn=3600  # URL valid for 1 hour
+        )
+    except ClientError as e:
+        current_app.logger.error(e)
+        return jsonify({'error': 'Could not generate presigned URL'}), 500
+    
+    return jsonify({'presigned_url': presigned_url, 'filename': unique_filename})
 
 @videos_bp.route('/upload', methods=['POST'])
 def upload_file():

@@ -1,3 +1,4 @@
+#This is the script run in remote server.
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import JSONB
@@ -81,11 +82,13 @@ def upload_filename_to_s3(filename, acl="public-read"):
     # after upload file to s3 bucket, return filename of the uploaded file
     return url
 
+# run the ffmpeg command for job. If job.mode is preview, run command without "-t <preview_time>"
+# to generate full video
 def process_job(job_id):
   output_video_path = f"{os.getenv('DOWNLOAD_FOLDER', '')}{job_id}.mp4" 
   try:
     job = session.execute(db.select(Job).filter_by(job_id=job_id)).scalar_one()
-    if job.status == 'completed' and not job.output == None:
+    if job.status == 'completed' and job.mode == 'full'  and not job.output == None:
        print(f"job:{job_id} already processed")
        return
     origin_commands = job.command

@@ -15,7 +15,10 @@ def create_app():
     app.config['SESSION_PERMANENT'] = True
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # Replace with your secret key
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=SESSION_EXPIRATION_IN_HOURS) 
-    # app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+    app.config['S3_BUCKET'] = os.getenv('AWS_BUCKET_NAME', 'notebookvideo')
+    app.config['S3_REGION'] = os.getenv('AWS_DEFAULT_REGION', 'us-west-2')
+    app.config['AWS_ACCESS_KEY'] =  os.getenv('AWS_ACCESS_KEY')
+    app.config['AWS_SECRET_KEY'] = os.getenv('AWS_SECRET_ACCESS_KEY')    # app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
     # app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to the session cookie
     # app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Adjust as needed ('Strict', 'Lax', 'None')
     CORS(app, supports_credentials=True)
